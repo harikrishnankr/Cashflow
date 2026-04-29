@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper:            #FAF7F2;
+  --paper-2:          #F3EEE5;
+  --paper-3:          #E8E1D4;
+  --ink:              #14110D;
+  --ink-2:            #3A3530;
+  --ink-3:            #6B645B;
+  --ink-4:            #A39C90;
+  --hairline:         #E3DCCE;
+  --hairline-strong:  #CDC4B1;
+
+  --card:             #FFFFFF;
+  --card-hover:       #FBF9F4;
+
+  --orange:           #E25A1C;
+  --orange-ink:       #B9430B;
+  --orange-wash:      #FDEBDE;
+
+  --positive:         #2F7D4F;
+  --positive-wash:    #E4F1E8;
+  --negative:         #B23A2A;
+  --negative-wash:    #F6E3DF;
+  --warning:          #B8860B;
+  --warning-wash:     #F7EED4;
+  --info:             #2A5B8C;
+  --info-wash:        #E3ECF5;
+
+  --chart-1: #E25A1C;
+  --chart-2: #2F7D4F;
+  --chart-3: #8A6A3B;
+  --chart-4: #2A5B8C;
+  --chart-5: #B23A2A;
+  --chart-6: #6B645B;
+
+  --t-display-xl: clamp(48px, 6vw, 88px);
+  --t-display:    clamp(36px, 4vw, 56px);
+  --t-h1:         32px;
+  --t-h2:         24px;
+  --t-h3:         18px;
+  --t-body:       15px;
+  --t-small:      13px;
+  --t-micro:      11px;
+
+  --lh-tight:   1.08;
+  --lh-snug:    1.25;
+  --lh-normal:  1.45;
+  --lh-relaxed: 1.6;
+
+  --ls-tight:  -0.02em;
+  --ls-normal: 0;
+  --ls-caps:   0.08em;
+
+  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;  --s-4: 16px;
+  --s-5: 24px;  --s-6: 32px;  --s-7: 48px;  --s-8: 64px;  --s-9: 96px;
+
+  --r-xs:   4px;
+  --r-sm:   6px;
+  --r-md:   10px;
+  --r-lg:   14px;
+  --r-pill: 999px;
+
+  --shadow-xs: 0 1px 0 rgba(20,17,13,0.04);
+  --shadow-sm: 0 1px 2px rgba(20,17,13,0.06), 0 1px 1px rgba(20,17,13,0.04);
+  --shadow-md: 0 4px 12px rgba(20,17,13,0.08), 0 1px 2px rgba(20,17,13,0.04);
+  --shadow-lg: 0 16px 40px rgba(20,17,13,0.12), 0 2px 6px rgba(20,17,13,0.06);
+
+  --ease-standard:   cubic-bezier(0.2, 0.0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0.0, 0, 1.1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--hairline-strong);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-base) var(--ease-standard);
 }
+a:hover { text-decoration-color: var(--orange); }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--hairline);
 }

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 40" fill="none">
+  <rect width="40" height="40" rx="8" fill="#14110D"></rect>
+  <path d="M12 14c0-1.1.9-2 2-2h12a2 2 0 0 1 2 2v2H12v-2z" fill="#E25A1C"></path>
+  <path d="M12 18h16v3H12z" fill="#FAF7F2"></path>
+  <path d="M12 23h16v3a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2v-3z" fill="#FAF7F2" opacity="0.6"></path>
+  <text x="52" y="27" font-family="Georgia, 'Fraunces', serif" font-size="22" font-weight="500" fill="white" letter-spacing="-0.5">CashFlow</text>
+</svg>
