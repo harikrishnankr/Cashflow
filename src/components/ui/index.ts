@@ -6,3 +6,4 @@ export { Modal } from "./modal";
 export { Table } from "./table";
 export { Badge } from "./badge";
 export { Logo, LogoMark } from "./logo";
+export * from "./icons";

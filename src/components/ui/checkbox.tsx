@@ -2,6 +2,7 @@
 
 import { InputHTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
+import { CheckIcon } from "./icons";
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   label: string;
@@ -18,11 +19,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         )}
         aria-hidden
       >
-        {checked && (
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        )}
+        {checked && <CheckIcon />}
       </span>
       {label}
     </label>
