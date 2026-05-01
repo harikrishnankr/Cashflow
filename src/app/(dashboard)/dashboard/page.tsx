@@ -7,7 +7,7 @@ export default function DashboardPage() {
     <div className="max-w-5xl mx-auto">
       <div className="mb-8">
         <h1
-          className="text-[32px] font-normal tracking-[-0.02em] m-0"
+          className="text-[2rem] font-normal tracking-[-0.02em] m-0"
           style={{ fontFamily: "var(--font-display)" }}
         >
           Dashboard
@@ -22,11 +22,11 @@ export default function DashboardPage() {
           { label: "Expenses", value: "$1,591.48", change: "+$160 vs March", positive: false },
         ].map((card) => (
           <div key={card.label} className="bg-(--card) border border-(--hairline) rounded-(--r-md) p-5">
-            <p className="text-[11px] font-semibold tracking-(--ls-caps) uppercase text-(--ink-3) m-0 mb-2">
+            <p className="text-[0.6875rem] font-semibold tracking-(--ls-caps) uppercase text-(--ink-3) m-0 mb-2">
               {card.label}
             </p>
             <p
-              className="text-[28px] font-normal tracking-[-0.02em] m-0"
+              className="text-[1.75rem] font-normal tracking-[-0.02em] m-0"
               style={{ fontFamily: "var(--font-display)", fontVariantNumeric: "tabular-nums" }}
             >
               {card.value}

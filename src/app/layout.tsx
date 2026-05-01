@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { RegisterSW } from "@/components/pwa/register-sw";
-import { ApiProvider } from "@/components/ApiProvider";
+import { ApiProvider } from "@/components/api-provider";
 import "./globals.css";
 
 const fraunces = Fraunces({

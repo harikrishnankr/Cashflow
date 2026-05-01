@@ -25,7 +25,7 @@ export function Table<T>({ columns, data, keyField, className, emptyMessage = "N
             {columns.map((col) => (
               <th
                 key={String(col.key)}
-                className={cn("px-4 py-3 text-left text-[11px] font-semibold tracking-(--ls-caps) uppercase text-(--ink-3)", col.className)}
+                className={cn("px-4 py-3 text-left text-[0.6875rem] font-semibold tracking-(--ls-caps) uppercase text-(--ink-3)", col.className)}
               >
                 {col.header}
               </th>

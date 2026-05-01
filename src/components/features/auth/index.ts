@@ -1,5 +1,6 @@
-export { LoginForm } from "./login/login-form";
-export { PreviewStatement } from "./login/preview-statement";
+export { LoginForm } from "./login/login";
+
+export { PreviewStatement } from "./preview-statement/preview-statement";
 
 export { RegisterForm } from "./register/register";
 export { ValueProps } from "./register/value-props/value-props";

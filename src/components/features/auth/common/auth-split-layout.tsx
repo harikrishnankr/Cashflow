@@ -28,7 +28,7 @@ export function AuthSplitLayout({
       {/* Dark editorial left panel — hidden on mobile */}
       <div
         className="hidden lg:flex flex-col relative overflow-hidden
-                   px-6 py-8 lg:p-[44px_48px]"
+                   px-6 py-8 lg:py-11 lg:px-12"
         style={{ background: "var(--ink)", color: "var(--paper)" }}
       >
         {/* Brand */}
@@ -44,7 +44,7 @@ export function AuthSplitLayout({
         {/* Pitch */}
         <div className="mt-auto">
           <div
-            className="flex items-center gap-2.5 mb-4 text-[11px] tracking-widest uppercase"
+            className="flex items-center gap-2.5 mb-4 text-[0.6875rem] tracking-widest uppercase"
             style={{ fontFamily: "var(--font-mono)", color: "rgba(250,247,242,0.55)" }}
           >
             <span className="w-7 h-px" style={{ background: "rgba(250,247,242,0.35)" }} />
@@ -52,7 +52,7 @@ export function AuthSplitLayout({
           </div>
 
           <h2
-            className="font-normal m-0 leading-[1.04] tracking-[-0.025em] text-[54px]"
+            className="font-normal m-0 leading-[1.04] tracking-[-0.025em] text-[3.375rem]"
             style={{ fontFamily: "var(--font-display)", color: "var(--paper)" }}
           >
             {headline}
@@ -91,13 +91,13 @@ export function AuthSplitLayout({
       </div>
 
       {/* Right form panel */}
-      <div className="flex flex-col bg-(--paper) px-6 py-5 lg:p-[44px_56px]">
+      <div className="flex flex-col bg-(--paper) px-6 py-5 lg:py-11 lg:px-14">
         {/* Mobile-only header: logo mark + name + opposite page link */}
         <div className="flex items-center justify-between lg:hidden mb-5">
           <div className="flex items-center gap-2">
             <LogoMark className="h-6.5 w-6.5" />
             <span
-              className="text-[16px] tracking-[-0.01em]"
+              className="text-base tracking-[-0.01em]"
               style={{ fontFamily: "var(--font-display)" }}
             >
               CashFlow
@@ -105,7 +105,7 @@ export function AuthSplitLayout({
           </div>
           <Link
             href={switchLink.href}
-            className="text-[13px] underline decoration-(--hairline-strong) underline-offset-[3px]"
+            className="text-[0.8125rem] underline decoration-(--hairline-strong) underline-offset-[0.1875rem]"
             style={{ color: "var(--ink)" }}
           >
             {switchLink.text}

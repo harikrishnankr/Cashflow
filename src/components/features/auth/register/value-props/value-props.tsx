@@ -40,7 +40,7 @@ export const ValueProps = () => {
               {title}
             </div>
             <div
-              className="text-[13px] mt-0.5"
+              className="text-[0.8125rem] mt-0.5"
               style={{ color: "rgba(250,247,242,0.55)" }}
             >
               {sub}

@@ -29,11 +29,11 @@ export function RegisterForm({ onSubmit, error, loading }: RegisterFormProps) {
 
   return (
     <div className="my-auto max-w-100 w-full self-center">
-      <span className="text-[11px] font-semibold tracking-(--ls-caps) uppercase text-(--ink-3) mb-2.5 block">
+      <span className="text-[0.6875rem] font-semibold tracking-(--ls-caps) uppercase text-(--ink-3) mb-2.5 block">
         Create account
       </span>
       <h3
-        className="font-normal text-[40px] tracking-[-0.02em] m-0 mb-2 leading-[1.05]"
+        className="font-normal text-[2.5rem] tracking-[-0.02em] m-0 mb-2 leading-[1.05]"
         style={{ fontFamily: "var(--font-display)" }}
       >
         Start your ledger.

@@ -19,7 +19,7 @@ export function TermsCheckbox({
           I agree to the{" "}
           <Link
             href="/terms"
-            className="underline decoration-(--hairline-strong) underline-offset-[3px]"
+            className="underline decoration-(--hairline-strong) underline-offset-[0.1875rem]"
             style={{ color: "var(--ink-2)" }}
           >
             Terms
@@ -27,7 +27,7 @@ export function TermsCheckbox({
           and{" "}
           <Link
             href="/privacy"
-            className="underline decoration-(--hairline-strong) underline-offset-[3px]"
+            className="underline decoration-(--hairline-strong) underline-offset-[0.1875rem]"
             style={{ color: "var(--ink-2)" }}
           >
             Privacy Policy

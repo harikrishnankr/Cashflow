@@ -66,7 +66,7 @@ export function PasswordInput({
             ))}
           </div>
           <p
-            className="text-[11px] mt-1.5 tracking-[0.05em]"
+            className="text-[0.6875rem] mt-1.5 tracking-[0.05em]"
             style={{ fontFamily: "var(--font-mono)", color: "var(--ink-3)" }}
           >
             Strength:{" "}
