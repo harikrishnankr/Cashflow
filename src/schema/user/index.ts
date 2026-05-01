@@ -1,3 +1,5 @@
+export type UserRole = "admin" | "member";
+
 export type User = {
   id: string;
   email: string;
@@ -7,8 +9,6 @@ export type User = {
   createdAt: string;
   updatedAt: string;
 };
-
-export type UserRole = "admin" | "member";
 
 export type CreateUserDto = {
   email: string;

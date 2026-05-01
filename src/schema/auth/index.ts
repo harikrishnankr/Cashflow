@@ -1,3 +1,5 @@
+import type { ErrorCode } from "@/lib/errors";
+
 export type LoginCredentials = {
   email: string;
   password: string;
@@ -23,8 +25,6 @@ export type AuthSession = {
   accessToken: string;
   expiresAt: string;
 };
-
-import type { ErrorCode } from "@/lib/errors";
 
 export type AuthErrorCode = Extract<
   ErrorCode,

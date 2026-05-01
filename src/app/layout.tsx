@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { RegisterSW } from "@/components/pwa/register-sw";
+import { ApiProvider } from "@/components/ApiProvider";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -52,7 +53,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen antialiased" style={{ fontFamily: "var(--font-sans)" }}>
         <RegisterSW />
-        {children}
+        <ApiProvider>{children}</ApiProvider>
       </body>
     </html>
   );

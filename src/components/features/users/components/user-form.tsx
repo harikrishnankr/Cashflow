@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { User, UpdateUserDto } from "@/types/user.types";
+import type { User, UpdateUserDto } from "@/schema/user";
 
 interface UserFormProps {
   user?: User;

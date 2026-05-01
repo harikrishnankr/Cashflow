@@ -1,7 +1,7 @@
 import { Table } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
-import type { User } from "@/types/user.types";
+import type { User } from "@/schema/user";
 
 interface UserTableProps {
   users: User[];

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { BaseError, ErrorCode } from "@/lib/errors";
 import { logger } from "@/lib/logger";
-import type { ApiResponse } from "@/types/api.types";
+import type { ApiResponse } from "@/schema/common";
 
 export function ok<T>(data: T, status = 200): NextResponse<ApiResponse<T>> {
   return NextResponse.json({ ok: true, data }, { status });
@@ -17,7 +17,7 @@ export function error(
 export function error(
   err: unknown,
   fallbackMessage?: string,
-  context?: Record<string, unknown>,
+  context?: number | Record<string, unknown>,
 ): NextResponse<ApiResponse<never>>;
 
 export function error(

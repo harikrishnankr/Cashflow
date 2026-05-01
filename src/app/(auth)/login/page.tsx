@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthSplitLayout, LoginForm, PreviewStatement } from "@/components/features/auth";
-import { apiClient } from "@/lib/api/client";
-import type { LoginCredentials } from "@/types/auth.types";
+import { AuthSplitLayout, LoginForm, PreviewStatement, useLogin } from "@/components/features/auth";
+import type { LoginCredentials } from "@/schema/auth";
 
 const PREVIEW_TRANSACTIONS = [
   { label: "Salary · Quanta", amount: "+ $3,800.00", positive: true },
@@ -15,29 +13,17 @@ const PREVIEW_TRANSACTIONS = [
 
 export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const loginMutation = useLogin();
 
   const now = new Date();
   const monthYear = now.toLocaleString("en-US", { month: "long", year: "numeric" });
 
   async function handleLogin(credentials: LoginCredentials) {
-    setError("");
-    setLoading(true);
-
     try {
-      const result = await apiClient.auth.login(credentials);
-
-      if (!result.ok) {
-        setError(result.error.message);
-        return;
-      }
-
+      await loginMutation.mutateAsync(credentials);
       router.push("/dashboard");
     } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      // error is captured in loginMutation.error
     }
   }
 
@@ -63,7 +49,11 @@ export default function LoginPage() {
         />
       }
     >
-      <LoginForm onSubmit={handleLogin} error={error} loading={loading} />
+      <LoginForm
+        onSubmit={handleLogin}
+        loading={loginMutation.isPending}
+        error={loginMutation.error?.message}
+      />
     </AuthSplitLayout>
   );
 }

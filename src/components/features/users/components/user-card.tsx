@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import type { User } from "@/types/user.types";
+import type { User } from "@/schema/user";
 
 interface UserCardProps {
   user: User;

@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { userService } from "@/server/modules/users";
 import { logger } from "@/lib/logger";
 import { ok, error } from "@/lib/response";
-import type { User } from "@/types/user.types";
+import type { User } from "@/schema/user";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

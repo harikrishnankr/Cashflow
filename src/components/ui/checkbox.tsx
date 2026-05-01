@@ -1,20 +1,21 @@
 "use client";
 
-import { InputHTMLAttributes, forwardRef } from "react";
+import { InputHTMLAttributes, forwardRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { CheckIcon } from "./icons";
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
-  label: string;
+  label: ReactNode;
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ label, checked, onChange, className, ...props }, ref) => (
     <label className={cn("flex items-center gap-2 text-sm text-(--ink-2) cursor-pointer select-none", className)}>
-      <input ref={ref} type="checkbox" checked={checked} onChange={onChange} className="sr-only" {...props} />
+      <input ref={ref} type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" {...props} />
       <span
         className={cn(
           "w-4 h-4 border rounded flex items-center justify-center transition-colors flex-none",
+          "peer-focus-visible:border-(--orange) peer-focus-visible:shadow-[0_0_0_3px_var(--orange-wash)]",
           checked ? "bg-(--ink) border-(--ink) text-(--paper)" : "bg-(--card) border-(--hairline-strong)"
         )}
         aria-hidden

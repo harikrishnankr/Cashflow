@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { registerUser } from "@/server/modules/auth";
-import { registerFormSchema } from "@/components/features/auth/schemas/register-form.schema";
+import { registerFormSchema } from "@/schema/auth/register.schema";
 import { logger } from "@/lib/logger";
 import { ok, error } from "@/lib/response";
-import type { AuthSession } from "@/types/auth.types";
+import type { AuthSession } from "@/schema/auth";
 
 export async function POST(request: NextRequest) {
   logger.info("POST /api/auth/register");

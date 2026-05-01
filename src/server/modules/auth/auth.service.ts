@@ -1,6 +1,6 @@
 import { authRepository } from "./auth.repository";
 import { InvalidCredentialsError, EmailTakenError } from "./auth.errors";
-import type { LoginCredentials, RegisterCredentials, AuthSession } from "@/types/auth.types";
+import type { LoginCredentials, RegisterCredentials, AuthSession } from "@/schema/auth";
 
 export type AuthResult<T> =
   | { ok: true; data: T }

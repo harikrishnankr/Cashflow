@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { AuthSession } from "@/types/auth.types";
+import type { AuthSession } from "@/schema/auth";
 
 interface AuthState {
   session: AuthSession | null;

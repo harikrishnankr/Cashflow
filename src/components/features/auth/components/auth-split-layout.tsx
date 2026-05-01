@@ -21,7 +21,7 @@ export function AuthSplitLayout({
   switchLink,
   decoration,
   extraContent,
-  footnote = ["v1.0.0", "SOC 2 type II", "Bank-grade encryption"],
+  footnote = ["v1.0.0", "Bank-grade encryption"],
 }: AuthSplitLayoutProps) {
   return (
     <div className="grid min-h-svh grid-cols-1 lg:grid-cols-2">

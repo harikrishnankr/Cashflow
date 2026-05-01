@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { CreateUserDto, UpdateUserDto } from "@/types/user.types";
+import type { CreateUserDto, UpdateUserDto } from "@/schema/user";
 
 export const userRepository = {
   async findAll(options?: { page?: number; pageSize?: number }) {

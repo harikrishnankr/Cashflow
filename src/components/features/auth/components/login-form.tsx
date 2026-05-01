@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Divider } from "@/components/ui/divider";
 import { SocialButton } from "./social-button";
 import { EyeIcon, ArrowRightIcon } from "@/components/ui/icons";
-import type { LoginCredentials } from "@/types/auth.types";
+import type { LoginCredentials } from "@/schema/auth";
 
 interface LoginFormProps {
   onSubmit: (credentials: LoginCredentials) => Promise<void>;

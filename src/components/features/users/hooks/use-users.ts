@@ -1,9 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api/client";
+import { http } from "@/lib/http";
+import { useAuthStore } from "@/components/features/auth/stores/auth-store";
+import type { PaginatedResponse } from "@/schema/common";
+import type { User } from "@/schema/user";
 
 export function useUsers(page = 1, pageSize = 20) {
+  const token = useAuthStore((s) => s.session?.accessToken);
+
   return useQuery({
     queryKey: ["users", { page, pageSize }],
-    queryFn: () => apiClient.users.list({ page, pageSize }),
+    queryFn: () =>
+      http<PaginatedResponse<User>["data"]>(
+        `/users?page=${page}&pageSize=${pageSize}`,
+        { token }
+      ),
   });
 }

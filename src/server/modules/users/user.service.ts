@@ -1,6 +1,6 @@
 import { userRepository } from "./user.repository";
 import { UserNotFoundError } from "./user.errors";
-import type { User, CreateUserDto, UpdateUserDto } from "@/types/user.types";
+import type { User, CreateUserDto, UpdateUserDto } from "@/schema/user";
 
 export const userService = {
   async list(options?: { page?: number; pageSize?: number }) {
