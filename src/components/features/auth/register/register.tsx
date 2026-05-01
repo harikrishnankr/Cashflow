@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Divider } from "@/components/ui/divider";
+import { Form } from "@/components/ui/form";
+import { FormFieldError } from "@/components/ui/form-field-error";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import type { RegisterCredentials } from "@/schema/auth";
+import { registerFormSchema } from "@/schema/auth/register.schema";
+import { useForm } from "@/hooks/use-form";
 import { SocialButton } from "../common/social-button";
 import { PasswordInput } from "./password-input/password-input";
 import { TermsCheckbox } from "./terms-checkbox/terms-checkbox";
@@ -17,16 +21,11 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ onSubmit, error, loading }: RegisterFormProps) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!agreed) return;
-    await onSubmit({ name, email, password });
-  }
+  const { values, setValue, errors, handleSubmit, fieldProps, errorId } = useForm(
+    registerFormSchema,
+    { name: "", email: "", password: "" }
+  );
 
   return (
     <div className="my-auto max-w-100 w-full self-center">
@@ -48,52 +47,55 @@ export function RegisterForm({ onSubmit, error, loading }: RegisterFormProps) {
         <Divider label="or with email" />
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        noValidate
-        className="flex flex-col gap-3.5"
+      <Form
+        onSubmit={handleSubmit(async (data) => {
+          if (!agreed) return;
+          await onSubmit(data);
+        })}
+        error={error}
+        actions={
+          <Button type="submit" fullWidth disabled={loading || !agreed}>
+            {loading ? "Creating account…" : "Create account"}
+            {!loading && <ArrowRightIcon />}
+          </Button>
+        }
       >
-        <Input
-          label="Full name"
-          type="text"
-          placeholder="Jamie Li"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          autoComplete="name"
-          required
-        />
-        <Input
-          label="Work email"
-          type="email"
-          placeholder="you@domain.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-          required
-        />
-        <PasswordInput value={password} onChange={setPassword} />
-
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Full name"
+            type="text"
+            placeholder="Jamie Li"
+            value={values.name}
+            onChange={(e) => setValue("name", e.target.value)}
+            autoComplete="name"
+            required
+            {...fieldProps("name")}
+          />
+          <FormFieldError id={errorId("name")} message={errors.name} />
+        </div>
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Work email"
+            type="email"
+            placeholder="you@domain.com"
+            value={values.email}
+            onChange={(e) => setValue("email", e.target.value)}
+            autoComplete="email"
+            required
+            {...fieldProps("email")}
+          />
+          <FormFieldError id={errorId("email")} message={errors.email} />
+        </div>
+        <div className="flex flex-col gap-1">
+          <PasswordInput
+            value={values.password}
+            onChange={(v) => setValue("password", v)}
+            {...fieldProps("password")}
+          />
+          <FormFieldError id={errorId("password")} message={errors.password} />
+        </div>
         <TermsCheckbox agreed={agreed} setAgreed={setAgreed} />
-
-        {error && (
-          <p
-            className="text-sm rounded-(--r-sm) px-3 py-2 border"
-            style={{
-              color: "var(--negative)",
-              background: "var(--negative-wash)",
-              borderColor:
-                "color-mix(in srgb, var(--negative) 20%, transparent)",
-            }}
-          >
-            {error}
-          </p>
-        )}
-
-        <Button type="submit" fullWidth disabled={loading || !agreed}>
-          {loading ? "Creating account…" : "Create account"}
-          {!loading && <ArrowRightIcon />}
-        </Button>
-      </form>
+      </Form>
 
       <div className="lg:hidden mt-1">
         <Divider label="or" />

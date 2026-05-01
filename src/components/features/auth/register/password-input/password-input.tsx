@@ -10,10 +10,21 @@ const STRENGTH_COLORS: Record<number, string> = {
   4: "var(--positive)",
 };
 
-export function PasswordInput({ value, onChange }: { value: string; onChange: (v: string) => void  }) {
+interface PasswordInputProps {
+  value: string;
+  onChange: (v: string) => void;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
+}
+
+export function PasswordInput({
+  value,
+  onChange,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedby,
+}: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
-  
-    const strength = getStrength(value);
+  const strength = getStrength(value);
 
   return (
     <div className="flex flex-col gap-0">
@@ -25,13 +36,17 @@ export function PasswordInput({ value, onChange }: { value: string; onChange: (v
         onChange={(e) => onChange(e.target.value)}
         autoComplete="new-password"
         required
+        aria-invalid={ariaInvalid}
+        aria-describedby={ariaDescribedby}
         trail={
-          <span
+          <button
+            type="button"
             onClick={() => setShowPassword((v) => !v)}
-            aria-label="Toggle password visibility"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="p-1 cursor-pointer"
           >
             <EyeIcon open={showPassword} />
-          </span>
+          </button>
         }
       />
       {value && (

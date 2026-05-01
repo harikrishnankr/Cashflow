@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Divider } from "@/components/ui/divider";
+import { Form } from "@/components/ui/form";
+import { FormFieldError } from "@/components/ui/form-field-error";
 import { EyeIcon, ArrowRightIcon } from "@/components/ui/icons";
 import type { LoginCredentials } from "@/schema/auth";
+import { loginFormSchema } from "@/schema/auth/login.schema";
+import { useForm } from "@/hooks/use-form";
 import { SocialButton } from "../common/social-button";
 
 interface LoginFormProps {
@@ -17,15 +21,9 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSubmit, error, loading }: LoginFormProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    await onSubmit({ email, password, rememberMe });
-  }
+  const { values, setValue, errors, handleSubmit, fieldProps, errorId } =
+    useForm(loginFormSchema, { email: "", password: "", rememberMe: true });
 
   return (
     <div className="my-auto max-w-100 w-full self-center">
@@ -38,63 +36,76 @@ export function LoginForm({ onSubmit, error, loading }: LoginFormProps) {
       >
         Welcome back.
       </h3>
-      <p className="text-(--ink-3) text-sm m-0 mb-8">Use your email or continue with a provider.</p>
+      <p className="text-(--ink-3) text-sm m-0 mb-8">
+        Use your email or continue with a provider.
+      </p>
 
-      {/* Desktop: social above form */}
       <div className="hidden lg:block">
         <SocialButton provider="google" className="mb-0" />
         <Divider label="or with email" />
       </div>
 
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3.5">
-        <Input
-          label="Email"
-          type="email"
-          placeholder="you@domain.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-          required
-        />
-        <Input
-          label="Password"
-          type={showPassword ? "text" : "password"}
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-          trail={
-            <span onClick={() => setShowPassword((v) => !v)} aria-label="Toggle password visibility">
-              <EyeIcon open={showPassword} />
-            </span>
-          }
-        />
-
+      <Form
+        onSubmit={handleSubmit((data) => onSubmit(data))}
+        error={error}
+        actions={
+          <Button type="submit" fullWidth disabled={loading}>
+            {loading ? "Signing in…" : "Sign in"}
+            {!loading && <ArrowRightIcon />}
+          </Button>
+        }
+      >
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Email"
+            type="email"
+            placeholder="you@domain.com"
+            value={values.email}
+            onChange={(e) => setValue("email", e.target.value)}
+            autoComplete="email"
+            required
+            {...fieldProps("email")}
+          />
+          <FormFieldError id={errorId("email")} message={errors.email} />
+        </div>
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            value={values.password}
+            onChange={(e) => setValue("password", e.target.value)}
+            autoComplete="current-password"
+            required
+            trail={
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="p-1 cursor-pointer"
+              >
+                <EyeIcon open={showPassword} />
+              </button>
+            }
+            {...fieldProps("password")}
+          />
+          <FormFieldError id={errorId("password")} message={errors.password} />
+        </div>
         <div className="flex justify-between items-center mt-1.5 mb-2">
           <Checkbox
             label="Keep me signed in"
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
+            checked={values.rememberMe}
+            onChange={(e) => setValue("rememberMe", e.target.checked)}
           />
-          <Link href="/forgot-password" className="text-sm text-(--ink) no-underline hover:underline hover:decoration-(--orange)">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-(--ink) no-underline hover:underline hover:decoration-(--orange)"
+          >
             Forgot password?
           </Link>
         </div>
+      </Form>
 
-        {error && (
-          <p className="text-sm text-(--negative) bg-(--negative-wash) border border-(--negative) border-opacity-20 rounded-(--r-sm) px-3 py-2">
-            {error}
-          </p>
-        )}
-
-        <Button type="submit" fullWidth disabled={loading}>
-          {loading ? "Signing in…" : "Sign in"}
-          {!loading && <ArrowRightIcon />}
-        </Button>
-      </form>
-
-      {/* Mobile: social below form */}
       <div className="lg:hidden mt-1">
         <Divider label="or" />
         <SocialButton provider="google" />
@@ -102,7 +113,13 @@ export function LoginForm({ onSubmit, error, loading }: LoginFormProps) {
 
       <p className="mt-6 text-xs text-(--ink-3) text-center leading-relaxed">
         By continuing you agree to our{" "}
-        <Link href="/terms" className="text-(--ink-2) underline decoration-(--hairline-strong) underline-offset-[3px]">Terms</Link>.
+        <Link
+          href="/terms"
+          className="text-(--ink-2) underline decoration-(--hairline-strong) underline-offset-[3px]"
+        >
+          Terms
+        </Link>
+        .
       </p>
     </div>
   );
