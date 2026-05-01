@@ -1,8 +1,12 @@
-export { AuthSplitLayout } from "./components/auth-split-layout";
-export { LoginForm } from "./components/login-form";
+export { LoginForm } from "./login/login-form";
+export { PreviewStatement } from "./login/preview-statement";
+
 export { RegisterForm } from "./register/register";
-export { PreviewStatement } from "./components/preview-statement";
-export { SocialButton } from "./components/social-button";
+export { ValueProps } from "./register/value-props/value-props";
+
+export { SocialButton } from "./common/social-button";
+export { AuthSplitLayout } from "./common/auth-split-layout";
 
 export { useLogin, useRegister, useLogout } from "./hooks/use-auth";
+
 export { useAuthStore } from "./stores/auth-store";

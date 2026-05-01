@@ -1,9 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { AuthSplitLayout, RegisterForm, useRegister } from "@/components/features/auth";
+import {
+  AuthSplitLayout,
+  RegisterForm,
+  useRegister,
+  ValueProps,
+} from "@/components/features/auth";
 import type { RegisterCredentials } from "@/schema/auth";
-import { ValueProps } from "./value-props";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -27,11 +31,17 @@ export default function RegisterPage() {
           <br />
           to read your
           <br />
-          <em style={{ fontStyle: "italic", color: "var(--orange)" }}>money.</em>
+          <em style={{ fontStyle: "italic", color: "var(--orange)" }}>
+            money.
+          </em>
         </>
       }
       extraContent={<ValueProps />}
-      switchLink={{ label: "Already have an account?", text: "Sign in", href: "/login" }}
+      switchLink={{
+        label: "Already have an account?",
+        text: "Sign in",
+        href: "/login",
+      }}
     >
       <RegisterForm
         onSubmit={handleRegister}

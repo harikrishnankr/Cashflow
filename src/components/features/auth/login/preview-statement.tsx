@@ -1,18 +1,23 @@
-interface Transaction {
-  label: string;
-  amount: string;
-  positive?: boolean;
-}
-
 interface PreviewStatementProps {
   period: string;
   balance: string;
   balanceCents: string;
   change: string;
-  transactions: Transaction[];
 }
 
-export function PreviewStatement({ period, balance, balanceCents, change, transactions }: PreviewStatementProps) {
+const PREVIEW_TRANSACTIONS = [
+  { label: "Salary · Quanta", amount: "+ $3,800.00", positive: true },
+  { label: "Blue Bottle Coffee", amount: "- $4.50" },
+  { label: "Whole Foods", amount: "- $68.12" },
+  { label: "Con Edison", amount: "- $94.00" },
+];
+
+export function PreviewStatement({
+  period,
+  balance,
+  balanceCents,
+  change,
+}: PreviewStatementProps) {
   return (
     <div
       className="absolute right-6 top-11 w-[320px] bg-(--paper) text-(--ink) rounded-[10px] p-[18px_20px] font-sans"
@@ -26,7 +31,10 @@ export function PreviewStatement({ period, balance, balanceCents, change, transa
       </span>
       <div
         className="font-display text-[36px] leading-none mt-2 tracking-[-0.02em]"
-        style={{ fontFamily: "var(--font-display)", fontVariantNumeric: "tabular-nums" }}
+        style={{
+          fontFamily: "var(--font-display)",
+          fontVariantNumeric: "tabular-nums",
+        }}
       >
         <span className="text-(--ink-3) text-[22px]">$</span>
         {balance}
@@ -38,14 +46,20 @@ export function PreviewStatement({ period, balance, balanceCents, change, transa
         </span>
       </div>
       <hr className="my-3.5 border-0 h-px bg-(--hairline)" />
-      {transactions.map((tx, i) => (
-        <div key={i} className="flex justify-between gap-2.5 text-xs mb-1.5 text-(--ink-2)">
+      {PREVIEW_TRANSACTIONS.map((tx, i) => (
+        <div
+          key={i}
+          className="flex justify-between gap-2.5 text-xs mb-1.5 text-(--ink-2)"
+        >
           <span className="min-w-0 whitespace-nowrap overflow-hidden text-ellipsis flex-1">
             {tx.label}
           </span>
           <span
             className="font-mono font-medium whitespace-nowrap flex-none"
-            style={{ fontVariantNumeric: "tabular-nums", color: tx.positive ? "var(--ink)" : "var(--negative)" }}
+            style={{
+              fontVariantNumeric: "tabular-nums",
+              color: tx.positive ? "var(--ink)" : "var(--negative)",
+            }}
           >
             {tx.amount}
           </span>

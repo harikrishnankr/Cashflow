@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Divider } from "@/components/ui/divider";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import type { RegisterCredentials } from "@/schema/auth";
-import { SocialButton } from "../components/social-button";
+import { SocialButton } from "../common/social-button";
 import { PasswordInput } from "./password-input/password-input";
 import { TermsCheckbox } from "./terms-checkbox/terms-checkbox";
 
