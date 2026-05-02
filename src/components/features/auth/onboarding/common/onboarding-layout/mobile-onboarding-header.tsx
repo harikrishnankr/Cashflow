@@ -16,7 +16,11 @@ export function MobileOnboardingHeader() {
   const { currentStep, stepNumber, totalSteps } = useOnboardingStep();
   const total = String(totalSteps).padStart(2, "0");
   const isWelcome = currentStep === OnboardingStepMap.Welcome;
+  const isFinish = currentStep === OnboardingStepMap.SetupFinish;
   const backRoute = BACK_ROUTES[currentStep] ?? "/onboarding/welcome";
+
+  // The setup-finish page renders its own full-screen mobile header
+  if (isFinish) return null;
 
   return (
     <div className="md:hidden px-6 py-4 flex items-center justify-between">

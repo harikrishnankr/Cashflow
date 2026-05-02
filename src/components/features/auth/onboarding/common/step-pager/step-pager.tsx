@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { OrderedOnboardingSteps } from "../../constants";
+import { OrderedOnboardingSteps, OnboardingStepMap } from "../../constants";
 import { useOnboardingStep } from "../../onboarding-provider";
 
 export function StepPager() {
   const { currentStep, stepNumber, totalSteps } = useOnboardingStep();
+  const isFinish = currentStep === OnboardingStepMap.SetupFinish;
 
   return (
     <div className="flex items-center justify-between gap-4 mb-10 text-xs text-(--ink-3) uppercase font-mono">
@@ -20,12 +21,18 @@ export function StepPager() {
           />
         ))}
       </div>
-      <Link
-        href="/onboarding/setup-finish"
-        className="hidden md:inline normal-case tracking-normal text-sm text-(--ink-3) hover:text-(--ink) transition-colors"
-      >
-        Skip for now
-      </Link>
+      {isFinish ? (
+        <span className="hidden md:inline tracking-widest text-[0.625rem]">
+          Setup · complete
+        </span>
+      ) : (
+        <Link
+          href="/onboarding/setup-finish"
+          className="hidden md:inline normal-case tracking-normal text-sm text-(--ink-3) hover:text-(--ink) transition-colors"
+        >
+          Skip for now
+        </Link>
+      )}
     </div>
   );
 }
