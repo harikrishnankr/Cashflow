@@ -6,10 +6,22 @@ import { cn } from "@/lib/utils";
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   trail?: ReactNode;
+  lead?: ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, trail, id, className, "aria-invalid": ariaInvalid, ...props }, ref) => {
+  (
+    {
+      label,
+      trail,
+      lead,
+      id,
+      className,
+      "aria-invalid": ariaInvalid,
+      ...props
+    },
+    ref,
+  ) => {
     const inputId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
     const isInvalid = ariaInvalid === true || ariaInvalid === "true";
 
@@ -24,6 +36,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
         <div className="relative">
+          {lead && (
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-(--ink-3) flex items-center justify-center">
+              {lead}
+            </span>
+          )}
           <input
             ref={ref}
             id={inputId}
@@ -34,8 +51,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "duration-120 placeholder:text-(--ink-4)",
               "focus:border-(--orange) focus:shadow-[0_0_0_3px_var(--orange-wash)]",
               trail && "pr-11",
+              lead && "pl-11",
               isInvalid && "border-(--negative)",
-              className
+              className,
             )}
             {...props}
           />
@@ -47,7 +65,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = "Input";

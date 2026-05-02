@@ -8,4 +8,6 @@ export { Modal } from "./modal";
 export { Table } from "./table";
 export { Badge } from "./badge";
 export { Logo, LogoMark } from "./logo";
+export { Select } from "./select";
+export { RadioGroup, RadioGroupItem, RadioItem, RadioCard } from "./radio-group";
 export * from "./icons";
