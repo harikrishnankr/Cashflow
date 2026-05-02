@@ -2,7 +2,7 @@ export { Button } from "./button";
 export { Form } from "./form";
 export { FormFieldError } from "./form-field-error";
 export { Input } from "./input";
-export { Checkbox } from "./checkbox";
+export { Checkbox, CheckboxCard } from "./checkbox";
 export { Divider } from "./divider";
 export { Modal } from "./modal";
 export { Table } from "./table";

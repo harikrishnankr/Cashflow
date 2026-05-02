@@ -1,6 +1,7 @@
 "use client";
 
 import { InputHTMLAttributes, forwardRef, type ReactNode } from "react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CheckIcon } from "./icons";
 
@@ -28,3 +29,53 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 );
 
 Checkbox.displayName = "Checkbox";
+
+// ─── CheckboxCard — toggleable card, multi-select equivalent of RadioCard ─────
+
+interface CheckboxCardProps {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  id?: string;
+  className?: string;
+  checkedClassName?: string;
+  uncheckedClassName?: string;
+  children: ReactNode;
+}
+
+export function CheckboxCard({
+  checked,
+  onCheckedChange,
+  id,
+  className,
+  checkedClassName,
+  uncheckedClassName,
+  children,
+}: CheckboxCardProps) {
+  return (
+    <label
+      htmlFor={id}
+      className={cn(
+        "relative cursor-pointer rounded-(--r-md) border",
+        "transition-all select-none focus-within:ring-2 focus-within:ring-(--orange) focus-within:ring-offset-1",
+        checked
+          ? cn("border-(--orange) bg-(--orange-wash)", checkedClassName)
+          : cn("border-(--hairline) bg-(--card) hover:border-(--hairline-strong) hover:bg-(--paper-2)", uncheckedClassName),
+        className,
+      )}
+    >
+      <input
+        type="checkbox"
+        id={id}
+        checked={checked}
+        onChange={(e) => onCheckedChange(e.target.checked)}
+        className="sr-only"
+      />
+      {children}
+      {checked && (
+        <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-(--orange) flex items-center justify-center">
+          <Check size={9} strokeWidth={3} className="text-white" />
+        </div>
+      )}
+    </label>
+  );
+}
