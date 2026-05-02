@@ -4,7 +4,7 @@ import {
   OnboardingStepDescriptions,
   OnboardingStepTitles,
   OrderedOnboardingSteps,
-} from "../constants";
+} from "../../constants";
 import classNames from "classnames";
 
 export function StepList({ selectedStep }: { selectedStep: OnboardingStep }) {

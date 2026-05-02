@@ -2,11 +2,12 @@ import Image from "next/image";
 
 interface LogoProps {
   className?: string;
+  dark?: boolean;
 }
 
-export function Logo({ className = "" }: LogoProps) {
+export function Logo({ className = "", dark }: LogoProps) {
   return (
-    <Image src="/logo.svg" alt="CashFlow" width={180} height={40} priority className={className} />
+    <Image src={dark ? "/logo-dark.svg" : "/logo.svg"} alt="CashFlow" width={180} height={40} priority className={className} />
   );
 }
 

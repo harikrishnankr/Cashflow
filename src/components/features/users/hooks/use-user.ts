@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { http } from "@/lib/http";
-import { useAuthStore } from "@/components/features/auth/stores/auth-store";
 import type { User, UpdateUserDto } from "@/schema/user";
+import { useAuthStore } from "../../auth";
 
 export function useUser(id: string) {
   const token = useAuthStore((s) => s.session?.accessToken);
@@ -29,7 +29,8 @@ export function useDeleteUser() {
   const token = useAuthStore((s) => s.session?.accessToken);
 
   return useMutation({
-    mutationFn: (id: string) => http(`/users/${id}`, { method: "DELETE", token }),
+    mutationFn: (id: string) =>
+      http(`/users/${id}`, { method: "DELETE", token }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   });
 }
