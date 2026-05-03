@@ -2,12 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, Plus, Target } from "lucide-react";
-import { Button, Logo } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { useOnboardingData } from "@/components/features/auth/onboarding/onboarding-provider";
-import {
-  OrderedOnboardingSteps,
-  OnboardingStepMap,
-} from "@/components/features/auth/onboarding/constants";
 import { CURRENCIES } from "@/components/features/auth/onboarding/currency-and-locale/constants";
 import { INCOME_SOURCES } from "@/components/features/auth/onboarding/income-sources/constants";
 
@@ -65,38 +61,7 @@ export default function SetupFinishPage() {
 
   return (
     <>
-      {/* ── Mobile: full-screen dark overlay ───────────────────────────────── */}
-      <div className="md:hidden fixed inset-0 z-50 overflow-y-auto bg-(--ink) text-(--paper) px-6 pt-5 pb-10 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Logo />
-          </div>
-          <span
-            className="text-[11px] tracking-widest uppercase"
-            style={{
-              fontFamily: "var(--font-mono)",
-              color: "rgba(250,247,242,0.55)",
-            }}
-          >
-            04 / 04
-          </span>
-        </div>
-
-        {/* Pips */}
-        <div className="flex gap-1.5 mb-9">
-          {OrderedOnboardingSteps.map((step) => (
-            <span
-              key={step}
-              className={`flex-1 h-1 rounded-xs ${
-                step === OnboardingStepMap.SetupFinish
-                  ? "bg-(--orange)"
-                  : "bg-(--paper) opacity-90"
-              }`}
-            />
-          ))}
-        </div>
-
+      <div className="md:hidden inset-0 z-50 overflow-y-auto bg-(--ink) text-(--paper) px-6 pt-5 pb-10 flex flex-col">
         {/* Badge */}
         <div className="flex items-center gap-2.5 mb-4">
           <div className="w-8 h-8 rounded-full bg-(--orange) flex items-center justify-center shrink-0">
@@ -218,7 +183,7 @@ export default function SetupFinishPage() {
       {/* ── Desktop ─────────────────────────────────────────────────────────── */}
       <div className="hidden md:block">
         {/* Complete card */}
-        <div className="bg-(--ink) border border-(--hairline) rounded-(--r-md) p-8 flex gap-10 mt-2">
+        <div className="bg-(--ink) border border-(--hairline) rounded-(--r-md) p-8 flex md:flex-col lg:flex-row gap-10 mt-2">
           {/* Left */}
           <div className="flex-1 min-w-0">
             <div
@@ -251,7 +216,7 @@ export default function SetupFinishPage() {
           </div>
 
           {/* Right — summary */}
-          <div className="w-52 shrink-0 border-l border-(--hairline) pl-8">
+          <div className="lg:w-52 shrink-0 lg:border-l lg:border-(--hairline) lg:pl-8">
             {summaryRows.map(({ label, value, highlight }) => (
               <div
                 key={label}

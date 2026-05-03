@@ -19,13 +19,10 @@ export function MobileOnboardingHeader() {
   const isFinish = currentStep === OnboardingStepMap.SetupFinish;
   const backRoute = BACK_ROUTES[currentStep] ?? "/onboarding/welcome";
 
-  // The setup-finish page renders its own full-screen mobile header
-  if (isFinish) return null;
-
   return (
     <div className="md:hidden px-6 py-4 flex items-center justify-between">
-      {isWelcome ? (
-        <Logo className="h-6 w-auto" />
+      {isWelcome || isFinish ? (
+        <Logo className="h-6 w-auto" dark={isWelcome} />
       ) : (
         <Link
           href={backRoute}
@@ -42,7 +39,7 @@ export function MobileOnboardingHeader() {
         {stepNumber} / {total}
       </span>
 
-      {isWelcome ? (
+      {(isWelcome || isFinish) ? (
         <div className="w-8" />
       ) : (
         <Link

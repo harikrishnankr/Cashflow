@@ -67,7 +67,7 @@ export default function WelcomePage() {
         </div>
       </div>
 
-      <PageFooter onBack={() => {}} isBackDisabled={true} nextPage="currency" />
+      <PageFooter onBack={() => {}} isBackDisabled={true} nextHint="currency" />
     </>
   );
 }
