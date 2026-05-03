@@ -1,6 +1,2 @@
-export {
-  loginUser,
-  registerUser,
-  logoutUser,
-  refreshSession,
-} from "./auth.service";
+export * from "./auth.controller";
+export { COOKIE_ACCESS_TOKEN, COOKIE_REFRESH_TOKEN } from "./auth.constants";

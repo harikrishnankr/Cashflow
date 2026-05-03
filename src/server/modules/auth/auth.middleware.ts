@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-
-export const COOKIE_ACCESS_TOKEN = "access_token";
-export const COOKIE_REFRESH_TOKEN = "refresh_token";
+import { COOKIE_ACCESS_TOKEN, COOKIE_REFRESH_TOKEN } from "./auth.constants";
 
 export function accessTokenCookieOptions(ttlMs: number) {
   return {
@@ -58,8 +56,11 @@ export function withAuth(
       return handler(req, userId);
     } catch {
       return NextResponse.json(
-        { ok: false, error: { code: "UNAUTHORIZED", message: "Invalid or expired token." } },
-        { status: 401 }
+        {
+          ok: false,
+          error: { code: "UNAUTHORIZED", message: "Invalid or expired token." },
+        },
+        { status: 401 },
       );
     }
   };

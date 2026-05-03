@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
-import { authController } from "@/server/modules/auth/auth.controller";
 import { error } from "@/lib/response";
+import { authController } from "@/server/modules/auth";
 
 export async function POST(req: NextRequest) {
   try {

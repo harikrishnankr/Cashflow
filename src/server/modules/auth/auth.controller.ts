@@ -12,8 +12,6 @@ import {
   refreshSession,
 } from "./auth.service";
 import {
-  COOKIE_ACCESS_TOKEN,
-  COOKIE_REFRESH_TOKEN,
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
   clearAuthCookies,
@@ -22,6 +20,8 @@ import { extractMeta, parseAndValidate } from "@/server/utils/validator.utils";
 import { unwrap } from "./auth.utils";
 import {
   ACCESS_TTL_MS,
+  COOKIE_ACCESS_TOKEN,
+  COOKIE_REFRESH_TOKEN,
   REFRESH_TTL_LONG_MS,
   REFRESH_TTL_MS,
 } from "./auth.constants";
@@ -49,7 +49,7 @@ class AuthController {
       refreshToken,
       refreshTokenCookieOptions(refreshTtlMs),
     );
-  
+
     return response;
   }
 

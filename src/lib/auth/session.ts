@@ -1,8 +1,8 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
-import { COOKIE_ACCESS_TOKEN } from "@/server/modules/auth/auth.middleware";
 import type { AuthSession } from "@/schema/auth";
+import { COOKIE_ACCESS_TOKEN } from "@/server/modules/auth";
 
 // Verifies the access_token cookie and returns the session without a DB round-trip.
 // Returns null if the token is absent, invalid, or expired.
