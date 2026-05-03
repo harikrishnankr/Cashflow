@@ -1,72 +1,155 @@
 import { authRepository } from "./auth.repository";
 import { InvalidCredentialsError, EmailTakenError } from "./auth.errors";
-import type { LoginCredentials, RegisterCredentials, AuthSession } from "@/schema/auth";
+import type {
+  LoginCredentials,
+  RegisterCredentials,
+  LoginResponse,
+  RegisterResponse,
+  RefreshResponse,
+} from "@/schema/auth";
+import {
+  ACCESS_TTL_MS,
+  REFRESH_TTL_LONG_MS,
+  REFRESH_TTL_MS,
+} from "./auth.constants";
+import {
+  generateAccessToken,
+  generateRefreshTokenRaw,
+  hashPassword,
+  hashToken,
+  verifyPassword,
+} from "./auth.utils";
 
-export type AuthResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: { code: string; message: string } };
+export async function loginUser(
+  credentials: LoginCredentials,
+  meta?: { userAgent?: string; ipAddress?: string },
+): Promise<LoginResponse> {
+  const user = await authRepository.findByEmail(credentials.email);
+  if (!user || !user.passwordHash) throw new InvalidCredentialsError();
 
-export async function loginUser(credentials: LoginCredentials): Promise<AuthResult<AuthSession>> {
-  try {
-    const user = await authRepository.findByEmail(credentials.email);
+  const valid = await verifyPassword(credentials.password, user.passwordHash);
+  if (!valid) throw new InvalidCredentialsError();
 
-    if (!user) throw new InvalidCredentialsError();
+  const rawRefreshToken = generateRefreshTokenRaw();
+  const [accessToken, refreshTokenHash] = await Promise.all([
+    generateAccessToken({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt.toISOString(),
+    }),
+    hashToken(rawRefreshToken),
+  ]);
 
-    // TODO: replace with bcrypt.compare(credentials.password, user.passwordHash)
-    const passwordValid = credentials.password === user.passwordHash;
-    if (!passwordValid) throw new InvalidCredentialsError();
+  const rememberMe = credentials.rememberMe ?? false;
+  await authRepository.createRefreshToken({
+    userId: user.id,
+    tokenHash: refreshTokenHash,
+    rememberMe,
+    expiresAt: new Date(
+      Date.now() + (rememberMe ? REFRESH_TTL_LONG_MS : REFRESH_TTL_MS),
+    ),
+    userAgent: meta?.userAgent,
+    ipAddress: meta?.ipAddress,
+  });
 
-    // TODO: generate a real JWT/session token
-    const accessToken = Buffer.from(`${user.id}:${Date.now()}`).toString("base64");
-    const expiresAt = new Date(Date.now() + (credentials.rememberMe ? 30 : 1) * 24 * 60 * 60 * 1000).toISOString();
-
-    return {
-      ok: true,
-      data: {
-        user: { id: user.id, email: user.email, name: user.name, avatarUrl: user.avatarUrl ?? undefined, createdAt: user.createdAt.toISOString() },
-        accessToken,
-        expiresAt,
+  return {
+    ok: true,
+    data: {
+      session: {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          avatarUrl: user.avatarUrl ?? undefined,
+          createdAt: user.createdAt.toISOString(),
+        },
       },
-    };
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      return { ok: false, error: { code: (err as { code?: string }).code ?? "UNKNOWN", message: err.message } };
-    }
-    return { ok: false, error: { code: "UNKNOWN", message: "Something went wrong." } };
-  }
+      accessToken,
+      refreshToken: rawRefreshToken,
+    },
+  };
 }
 
-export async function registerUser(credentials: RegisterCredentials): Promise<AuthResult<AuthSession>> {
-  try {
-    const exists = await authRepository.emailExists(credentials.email);
-    if (exists) throw new EmailTakenError();
+export async function registerUser(
+  credentials: RegisterCredentials,
+): Promise<RegisterResponse> {
+  const exists = await authRepository.emailExists(credentials.email);
+  if (exists) throw new EmailTakenError();
 
-    // TODO: hash password with bcrypt before storing
-    const user = await authRepository.createUser({
-      email: credentials.email,
-      name: credentials.name,
-      passwordHash: credentials.password,
-    });
+  const passwordHash = await hashPassword(credentials.password);
+  const user = await authRepository.createUser({
+    email: credentials.email,
+    name: credentials.name,
+    passwordHash,
+  });
 
-    const accessToken = Buffer.from(`${user.id}:${Date.now()}`).toString("base64");
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-
-    return {
-      ok: true,
-      data: {
-        user: { id: user.id, email: user.email, name: user.name, avatarUrl: user.avatarUrl ?? undefined, createdAt: user.createdAt.toISOString() },
-        accessToken,
-        expiresAt,
+  return {
+    ok: true,
+    data: {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatarUrl: user.avatarUrl ?? undefined,
+        createdAt: user.createdAt.toISOString(),
       },
-    };
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      return { ok: false, error: { code: (err as { code?: string }).code ?? "UNKNOWN", message: err.message } };
-    }
-    return { ok: false, error: { code: "UNKNOWN", message: "Something went wrong." } };
-  }
+    },
+  };
 }
 
-export async function logoutUser(_accessToken: string): Promise<void> {
-  // TODO: invalidate session/token in database
+export async function refreshSession(
+  rawRefreshToken: string,
+  meta?: { userAgent?: string; ipAddress?: string },
+): Promise<RefreshResponse> {
+  const tokenHash = await hashToken(rawRefreshToken);
+  const stored = await authRepository.findRefreshToken(tokenHash);
+
+  if (!stored) throw new InvalidCredentialsError();
+  if (stored.revokedAt) throw new InvalidCredentialsError();
+  if (stored.expiresAt < new Date()) throw new InvalidCredentialsError();
+
+  const user = await authRepository.findUserById(stored.userId);
+  if (!user) throw new InvalidCredentialsError();
+
+  const newRawToken = generateRefreshTokenRaw();
+  const [accessToken, newHash] = await Promise.all([
+    generateAccessToken({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt.toISOString(),
+    }),
+    hashToken(newRawToken),
+  ]);
+
+  const ttl = stored.rememberMe ? REFRESH_TTL_LONG_MS : REFRESH_TTL_MS;
+  await authRepository.rotateRefreshToken(tokenHash, {
+    userId: stored.userId,
+    tokenHash: newHash,
+    rememberMe: stored.rememberMe,
+    expiresAt: new Date(Date.now() + ttl),
+    userAgent: meta?.userAgent,
+    ipAddress: meta?.ipAddress,
+  });
+
+  return {
+    ok: true,
+    data: {
+      accessToken,
+      refreshToken: newRawToken,
+      rememberMe: stored.rememberMe,
+    },
+  };
 }
+
+export async function logoutUser(rawRefreshToken: string): Promise<void> {
+  const tokenHash = await hashToken(rawRefreshToken);
+  await authRepository.revokeRefreshToken(tokenHash).catch(() => {
+    // Silently ignore — token may already be expired or not found.
+  });
+}
+
+export { ACCESS_TTL_MS as ACCESS_TOKEN_TTL_MS };

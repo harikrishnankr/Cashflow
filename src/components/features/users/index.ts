@@ -7,5 +7,5 @@ export { useUser, useUpdateUser, useDeleteUser } from "./hooks/use-user";
 
 export { useUserStore } from "./stores/user-store";
 
-export { userFormSchema } from "./schemas/user-form.schema";
-export type { UserFormValues } from "./schemas/user-form.schema";
+export { userFormSchema } from "@/schema/user/user-form.schema";
+export type { UserFormValues } from "@/schema/user/user-form.schema";

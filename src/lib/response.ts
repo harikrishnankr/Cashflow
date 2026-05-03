@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { BaseError, ErrorCode } from "@/lib/errors";
+import { BaseError, ErrorCode, ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 import type { ApiResponse } from "@/schema/common";
 
@@ -49,10 +49,16 @@ export function error(
       status: errOrCode.statusCode,
       ...context,
     });
+    const fields =
+      errOrCode instanceof ValidationError ? errOrCode.fields : undefined;
     return NextResponse.json(
       {
         ok: false,
-        error: { code: errOrCode.code, message: errOrCode.message },
+        error: {
+          code: errOrCode.code,
+          message: errOrCode.message,
+          ...(fields && { fields }),
+        },
       },
       { status: errOrCode.statusCode },
     );

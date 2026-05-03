@@ -1,11 +1,11 @@
-import { logoutUser } from "@/server/modules/auth";
-import { logger } from "@/lib/logger";
-import { ok } from "@/lib/response";
+import type { NextRequest } from "next/server";
+import { authController } from "@/server/modules/auth/auth.controller";
+import { error } from "@/lib/response";
 
-export async function POST(request: Request) {
-  logger.info("POST /api/auth/logout");
-  const token = request.headers.get("authorization")?.replace("Bearer ", "") ?? "";
-  await logoutUser(token);
-  logger.info("Logout successful");
-  return ok(null);
+export async function POST(req: NextRequest) {
+  try {
+    return await authController.logout(req);
+  } catch (err) {
+    return error(err);
+  }
 }

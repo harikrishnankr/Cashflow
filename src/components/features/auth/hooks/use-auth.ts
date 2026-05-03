@@ -27,10 +27,9 @@ export function useRegister() {
 
 export function useLogout() {
   const clearSession = useAuthStore((s) => s.clearSession);
-  const token = useAuthStore((s) => s.session?.accessToken);
 
   return useMutation({
-    mutationFn: () => http("/auth/logout", { method: "POST", token }),
+    mutationFn: () => http("/auth/logout", { method: "POST" }),
     onSuccess: () => clearSession(),
   });
 }

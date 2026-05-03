@@ -1,12 +1,21 @@
 // ============================================================
-// Prisma Schema — Expense Tracker (Next.js + Supabase)
+// Prisma Schema — CashFlow (Next.js + Supabase PostgreSQL)
 // ============================================================
-// Key design decisions:
-//  - Uses Supabase Auth (auth.users) via unsupported() type for userId
-//  - Soft deletes on Expense/Income for audit trail
-//  - Enum-driven category + frequency types for query performance
-//  - Composite indexes for common dashboard query patterns
-//  - Notification preferences stored as a single JSON blob (flexible)
+// Auth strategy:
+//  - Custom email/password auth (argon2 + JWT + refresh tokens)
+//  - Cookie-based: access token (15 min) + refresh token (7d / 30d)
+//  - Google OAuth ready via googleId field
+//  - Refresh tokens stored as SHA-256 hashes — raw token lives only
+//    in the httpOnly cookie, never in plaintext in the database
+//
+// Prisma 7 connection config is in prisma.config.ts (not here):
+//  - migrations → DIRECT_URL (direct Supabase connection, bypasses PgBouncer)
+//  - runtime    → DATABASE_URL via PrismaPg adapter in src/lib/prisma.ts
+//
+// ID strategy:
+//  - User.id        → UUID  (goes inside JWTs; must not be guessable)
+//  - Everything else → Int autoincrement (smaller, faster, easier to read;
+//    enumeration risk is irrelevant because every route filters by userId)
 // ============================================================
 
 generator client {
@@ -76,20 +85,34 @@ enum NotificationChannel {
 }
 
 // ─────────────────────────────────────────────
-// USER PROFILE
-// Links to Supabase auth.users (managed externally)
+// USER
+// UUID because id is embedded in JWTs and must not be guessable.
+// passwordHash is nullable to support OAuth-only accounts.
 // ─────────────────────────────────────────────
-model UserProfile {
-  // Maps to the UUID from Supabase auth.users
-  id        String   @id @db.Uuid
-  email     String   @unique
-  name      String // This field should have min and max length
-  currency  String   @default("USD") // ISO 4217 code
-  timezone  String   @default("UTC")
+model User {
+  id    String @id @default(uuid()) @db.Uuid
+  email String @unique @db.VarChar(255)
+  name  String @db.VarChar(100)
+
+  // Credentials — null when the account was created via OAuth only
+  passwordHash String? @db.Text
+
+  // OAuth — populated on Google sign-in (future)
+  googleId  String? @unique @db.VarChar(255)
+  avatarUrl String? @db.Text
+
+  // Profile preferences
+  currency String @default("USD") @db.VarChar(3)
+  timezone String @default("UTC") @db.VarChar(50)
+
+  // Account state
+  emailVerifiedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
+  refreshTokens        RefreshToken[]
   expenses             Expense[]
   incomes              Income[]
   budgets              Budget[]
@@ -98,48 +121,83 @@ model UserProfile {
   notifications        Notification[]
   notificationSettings NotificationSettings?
 
-  @@map("user_profiles")
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// REFRESH TOKEN
+// Enables cookie-based auth with persistent sessions.
+//
+// Flow:
+//  1. Login → generate random token → SHA-256 hash → store here
+//  2. Send raw token in httpOnly cookie (refresh_token)
+//  3. On refresh → hash incoming cookie → lookup tokenHash → verify
+//  4. Logout → set revokedAt (or hard-delete)
+//  5. Nightly job → delete rows where expiresAt < NOW()
+//
+// rememberMe=false → 7-day expiry
+// rememberMe=true  → 30-day expiry
+// ─────────────────────────────────────────────
+model RefreshToken {
+  id Int @id @default(autoincrement())
+
+  userId    String @db.Uuid
+  // SHA-256 hex digest of the raw token — never stored in plaintext
+  tokenHash String @unique @db.VarChar(64)
+
+  rememberMe Boolean  @default(false)
+  expiresAt  DateTime
+
+  // Soft-revoke: set on logout or when the token is rotated
+  revokedAt DateTime?
+
+  // Optional security metadata for audit / anomaly detection
+  userAgent String? @db.Text
+  ipAddress String? @db.VarChar(45) // handles IPv4 and IPv6
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt]) // used by cleanup job
+  @@map("refresh_tokens")
 }
 
 // ─────────────────────────────────────────────
 // EXPENSE MANAGEMENT
 // ─────────────────────────────────────────────
 model Expense {
-  id         String          @id @default(cuid())
+  id         Int             @id @default(autoincrement())
   userId     String          @db.Uuid
-  amount     Decimal         @db.Decimal(12, 2) // Supports up to 9,999,999,999.99
+  amount     Decimal         @db.Decimal(12, 2)
   category   ExpenseCategory
   notes      String?         @db.Text
-  date       DateTime        @db.Date // Store date only for grouping queries
-  receiptUrl String? // Supabase Storage URL
+  date       DateTime        @db.Date
+  receiptUrl String?
 
-  // Soft delete — preserves history & analytics
   deletedAt DateTime?
 
-  // Link to the recurring template that spawned this entry (nullable)
-  recurringExpenseId String?
+  recurringExpenseId Int?
   recurringExpense   RecurringExpense? @relation(fields: [recurringExpenseId], references: [id])
 
-  // Relations
-  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Indexes optimized for dashboard & analytics queries
-  @@index([userId, date]) // Most common: "my expenses this month"
-  @@index([userId, category]) // Category breakdown
-  @@index([userId, date, category]) // Category breakdown for a period
-  @@index([deletedAt]) // Quickly filter soft-deleted rows
+  @@index([userId, date])
+  @@index([userId, category])
+  @@index([userId, date, category])
+  @@index([deletedAt])
   @@map("expenses")
 }
 
 // ─────────────────────────────────────────────
 // RECURRING EXPENSES (templates)
-// e.g. rent, Netflix, EMI
 // ─────────────────────────────────────────────
 model RecurringExpense {
-  id                 String             @id @default(cuid())
+  id                 Int                @id @default(autoincrement())
   userId             String             @db.Uuid
   amount             Decimal            @db.Decimal(12, 2)
   category           ExpenseCategory
@@ -147,20 +205,19 @@ model RecurringExpense {
   notes              String?            @db.Text
   frequency          RecurringFrequency
   startDate          DateTime           @db.Date
-  endDate            DateTime?          @db.Date // Null = indefinite
+  endDate            DateTime?          @db.Date
   nextDueDate        DateTime           @db.Date
   isActive           Boolean            @default(true)
   reminderDaysBefore Int                @default(3)
 
-  // Relations
-  user     UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expenses Expense[] // Expenses spawned from this template
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses Expense[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId, isActive])
-  @@index([nextDueDate, isActive]) // For cron jobs / reminder triggers
+  @@index([nextDueDate, isActive])
   @@map("recurring_expenses")
 }
 
@@ -168,7 +225,7 @@ model RecurringExpense {
 // INCOME TRACKING
 // ─────────────────────────────────────────────
 model Income {
-  id     String       @id @default(cuid())
+  id     Int          @id @default(autoincrement())
   userId String       @db.Uuid
   amount Decimal      @db.Decimal(12, 2)
   source IncomeSource
@@ -177,10 +234,10 @@ model Income {
 
   deletedAt DateTime?
 
-  recurringIncomeId String?
+  recurringIncomeId Int?
   recurringIncome   RecurringIncome? @relation(fields: [recurringIncomeId], references: [id])
 
-  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -191,7 +248,7 @@ model Income {
 }
 
 model RecurringIncome {
-  id          String             @id @default(cuid())
+  id          Int                @id @default(autoincrement())
   userId      String             @db.Uuid
   amount      Decimal            @db.Decimal(12, 2)
   source      IncomeSource
@@ -202,7 +259,7 @@ model RecurringIncome {
   nextDueDate DateTime           @db.Date
   isActive    Boolean            @default(true)
 
-  user    UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   incomes Income[]
 
   createdAt DateTime @default(now())
@@ -217,29 +274,25 @@ model RecurringIncome {
 // BUDGET MANAGEMENT
 // ─────────────────────────────────────────────
 model Budget {
-  id     String @id @default(cuid())
+  id     Int    @id @default(autoincrement())
   userId String @db.Uuid
   name   String
 
-  // Null category = overall spending limit for the period
   category ExpenseCategory?
   amount   Decimal          @db.Decimal(12, 2)
   period   BudgetPeriod
 
-  // Period start anchor — e.g. 2024-01-01 for January monthly budget
   periodStart DateTime @db.Date
   periodEnd   DateTime @db.Date
 
-  // Alert threshold — e.g. 0.80 fires alert at 80% spent
   alertThreshold Decimal @default(0.80) @db.Decimal(3, 2)
   isActive       Boolean @default(true)
 
-  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Prevent duplicate category budgets for the same period
   @@unique([userId, category, period, periodStart])
   @@index([userId, isActive, periodStart])
   @@map("budgets")
@@ -249,56 +302,51 @@ model Budget {
 // NOTIFICATIONS
 // ─────────────────────────────────────────────
 model Notification {
-  id      String              @id @default(cuid())
+  id      Int                 @id @default(autoincrement())
   userId  String              @db.Uuid
   type    NotificationType
   channel NotificationChannel @default(IN_APP)
   title   String
   body    String              @db.Text
 
-  // Flexible metadata: budgetId, recurringId, amount, etc.
   metadata Json?
   isRead   Boolean   @default(false)
   readAt   DateTime?
 
-  // When the notification should fire (for scheduled ones)
   scheduledAt DateTime?
   sentAt      DateTime?
 
-  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
   @@index([userId, isRead])
   @@index([userId, createdAt])
-  @@index([scheduledAt]) // For notification job scheduling
+  @@index([scheduledAt])
   @@map("notifications")
 }
 
 // ─────────────────────────────────────────────
-// NOTIFICATION SETTINGS (per user preferences)
+// NOTIFICATION SETTINGS (per-user preferences)
+// One row per user — userId doubles as the natural key,
+// so no separate surrogate id is needed.
 // ─────────────────────────────────────────────
 model NotificationSettings {
-  id     String @id @default(cuid())
-  userId String @unique @db.Uuid
+  userId String @id @db.Uuid
 
   billReminders  Boolean @default(true)
   budgetAlerts   Boolean @default(true)
   weeklySummary  Boolean @default(true)
   monthlySummary Boolean @default(true)
 
-  // Preferred channels
   emailEnabled Boolean @default(false)
   pushEnabled  Boolean @default(false)
   inAppEnabled Boolean @default(true)
 
-  // Weekly summary day: 0=Sunday … 6=Saturday
-  weeklySummaryDay Int @default(1)
-
-  // Monthly summary day of month: 1–28
+  weeklySummaryDay  Int @default(1)
   monthlySummaryDay Int @default(1)
 
-  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   updatedAt DateTime @updatedAt
 

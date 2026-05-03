@@ -15,11 +15,7 @@ export const useAuthStore = create<AuthState>()(
       session: null,
       setSession: (session) => set({ session }),
       clearSession: () => set({ session: null }),
-      isAuthenticated: () => {
-        const { session } = get();
-        if (!session) return false;
-        return new Date(session.expiresAt) > new Date();
-      },
+      isAuthenticated: () => !!get().session?.user,
     }),
     { name: "cashflow-auth" }
   )
