@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { userService } from "@/server/modules/users";
+import { userService } from "@/server/modules/user";
 import { logger } from "@/lib/logger";
 import { ok, error } from "@/lib/response";
 import type { User } from "@/schema/user";
@@ -8,7 +8,7 @@ type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   const { id } = await params;
-  logger.info("GET /api/users/[id]", { id });
+  logger.info("GET /api/user/[id]", { id });
 
   try {
     const user = await userService.getById(id);
@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
 export async function PATCH(request: NextRequest, { params }: Params) {
   const { id } = await params;
-  logger.info("PATCH /api/users/[id]", { id });
+  logger.info("PATCH /api/user/[id]", { id });
 
   const body = await request.json().catch(() => null);
 
@@ -41,7 +41,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   const { id } = await params;
-  logger.info("DELETE /api/users/[id]", { id });
+  logger.info("DELETE /api/user/[id]", { id });
 
   try {
     await userService.delete(id);

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { userService } from "@/server/modules/users";
+import { userService } from "@/server/modules/user";
 import { logger } from "@/lib/logger";
 import { ok, error } from "@/lib/response";
 import type { User } from "@/schema/user";
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const page = Number(searchParams.get("page") ?? 1);
   const pageSize = Number(searchParams.get("pageSize") ?? 20);
 
-  logger.info("GET /api/users", { page, pageSize });
+  logger.info("GET /api/user", { page, pageSize });
 
   try {
     const result = await userService.list({ page, pageSize });
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  logger.info("POST /api/users");
+  logger.info("POST /api/user");
 
   const body = await request.json().catch(() => null);
 

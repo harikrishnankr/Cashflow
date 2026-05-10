@@ -5,7 +5,7 @@ import type { User, UpdateUserDto } from "@/schema/user";
 export function useUser(id: string) {
   return useQuery({
     queryKey: ["users", id],
-    queryFn: () => http<User>(`/users/${id}`),
+    queryFn: () => http<User>(`/user/${id}`),
     enabled: !!id,
   });
 }
@@ -15,7 +15,7 @@ export function useUpdateUser(id: string) {
 
   return useMutation({
     mutationFn: (data: UpdateUserDto) =>
-      http<User>(`/users/${id}`, { method: "PATCH", body: data }),
+      http<User>(`/user/${id}`, { method: "PATCH", body: data }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   });
 }
@@ -25,7 +25,7 @@ export function useDeleteUser() {
 
   return useMutation({
     mutationFn: (id: string) =>
-      http(`/users/${id}`, { method: "DELETE" }),
+      http(`/user/${id}`, { method: "DELETE" }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   });
 }

@@ -105,6 +105,9 @@ model User {
   currency String @default("USD") @db.VarChar(3)
   timezone String @default("UTC") @db.VarChar(50)
 
+  // Onboarding state
+  hasOnBoarded Boolean @default(false)
+
   // Account state
   emailVerifiedAt DateTime?
 

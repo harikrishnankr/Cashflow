@@ -8,7 +8,7 @@ export function useUsers(page = 1, pageSize = 20) {
     queryKey: ["users", { page, pageSize }],
     queryFn: () =>
       http<PaginatedResponse<User>["data"]>(
-        `/users?page=${page}&pageSize=${pageSize}`
+        `/user?page=${page}&pageSize=${pageSize}`
       ),
   });
 }

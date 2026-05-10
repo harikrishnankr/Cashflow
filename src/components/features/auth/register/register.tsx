@@ -75,7 +75,7 @@ export function RegisterForm({ onSubmit, error, loading }: RegisterFormProps) {
         </div>
         <div className="flex flex-col gap-1">
           <Input
-            label="Work email"
+            label="Email"
             type="email"
             placeholder="you@domain.com"
             value={values.email}
