@@ -20,3 +20,5 @@ export { IncomeSourceCard, IncomeSourceRow, INCOME_SOURCES, FREQUENCIES } from "
 export { useLogin, useRegister, useLogout } from "./hooks/use-auth";
 
 export { useAuthStore } from "./stores/auth-store";
+
+export { useAuth } from "./context/auth-provider";

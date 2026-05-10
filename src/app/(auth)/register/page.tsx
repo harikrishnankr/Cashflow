@@ -16,7 +16,7 @@ export default function RegisterPage() {
   async function handleRegister(credentials: RegisterCredentials) {
     try {
       await registerMutation.mutateAsync(credentials);
-      router.push("/dashboard");
+      router.push("/login");
     } catch {
       // error is captured in registerMutation.error
     }

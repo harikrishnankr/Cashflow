@@ -1,10 +1,10 @@
 import type { NextRequest } from "next/server";
-import { error, ok } from "@/lib/response";
+import { error } from "@/lib/response";
 import { authController } from "@/server/modules/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    return ok(await authController.register(req));
+    return await authController.register(req);
   } catch (err) {
     return error(err);
   }

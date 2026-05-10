@@ -1,4 +1,5 @@
 import type { ErrorCode } from "@/lib/errors";
+import { UserProfile } from "../user";
 
 export type LoginCredentials = {
   email: string;
@@ -12,18 +13,10 @@ export type RegisterCredentials = {
   name: string;
 };
 
-export type AuthUser = {
-  id: string;
-  email: string;
-  name: string;
-  avatarUrl?: string;
-  createdAt: string;
-};
-
 // Cookie-based auth: tokens are set as httpOnly cookies by the server.
 // The client only receives the user object — it never sees raw token values.
 export type AuthSession = {
-  user: AuthUser;
+  user: UserProfile;
 };
 
 export type AuthErrorCode = Extract<

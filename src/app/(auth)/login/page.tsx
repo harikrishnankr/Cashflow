@@ -1,17 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   AuthSplitLayout,
   LoginForm,
   PreviewStatement,
+  useAuth,
   useLogin,
 } from "@/components/features/auth";
 import type { LoginCredentials } from "@/schema/auth";
 
 export default function LoginPage() {
-  const router = useRouter();
   const loginMutation = useLogin();
+  const { refresh } = useAuth();
 
   const now = new Date();
   const monthYear = now.toLocaleString("en-US", {
@@ -22,7 +22,7 @@ export default function LoginPage() {
   async function handleLogin(credentials: LoginCredentials) {
     try {
       await loginMutation.mutateAsync(credentials);
-      router.push("/dashboard");
+      refresh()
     } catch {
       // error is captured in loginMutation.error
     }

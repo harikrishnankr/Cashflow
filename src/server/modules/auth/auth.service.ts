@@ -26,7 +26,7 @@ export async function loginUser(
 ): Promise<LoginResponse> {
   const user = await authRepository.findByEmail(credentials.email);
   if (!user || !user.passwordHash) throw new InvalidCredentialsError();
-
+  
   const valid = await verifyPassword(credentials.password, user.passwordHash);
   if (!valid) throw new InvalidCredentialsError();
 
@@ -63,6 +63,11 @@ export async function loginUser(
           email: user.email,
           name: user.name,
           avatarUrl: user.avatarUrl ?? undefined,
+          currency: user.currency,
+          timezone: user.timezone,
+          hasOnBoarded: user.hasOnBoarded,
+          primaryIncomeSource: user.primaryIncomeSource || undefined,
+          updatedAt: user.updatedAt.toISOString(),
           createdAt: user.createdAt.toISOString(),
         },
       },

@@ -3,6 +3,7 @@ import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { RegisterSW } from "@/components/pwa/register-sw";
 import { ApiProvider } from "@/components/api-provider";
 import "./globals.css";
+import { AuthProvider } from "@/components/features/auth/context/auth-provider";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -51,9 +52,14 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="min-h-screen antialiased" style={{ fontFamily: "var(--font-sans)" }}>
+      <body
+        className="min-h-screen antialiased"
+        style={{ fontFamily: "var(--font-sans)" }}
+      >
         <RegisterSW />
-        <ApiProvider>{children}</ApiProvider>
+        <ApiProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ApiProvider>
       </body>
     </html>
   );

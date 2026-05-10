@@ -10,6 +10,11 @@ export const authRepository = {
         name: true,
         passwordHash: true,
         avatarUrl: true,
+        currency: true,
+        timezone: true,
+        hasOnBoarded: true,
+        primaryIncomeSource: true,
+        updatedAt: true,
         createdAt: true,
       },
     });
