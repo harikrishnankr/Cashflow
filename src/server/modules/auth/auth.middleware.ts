@@ -1,34 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-import { COOKIE_ACCESS_TOKEN, COOKIE_REFRESH_TOKEN } from "./auth.constants";
-
-export function accessTokenCookieOptions(ttlMs: number) {
-  return {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: Math.floor(ttlMs / 1000),
-  };
-}
-
-export function refreshTokenCookieOptions(ttlMs: number) {
-  return {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/api/auth", // scoped — only sent to the auth refresh endpoint
-    maxAge: Math.floor(ttlMs / 1000),
-  };
-}
-
-export function clearAuthCookies(response: NextResponse) {
-  response.cookies.set(COOKIE_ACCESS_TOKEN, "", { maxAge: 0, path: "/" });
-  response.cookies.set(COOKIE_REFRESH_TOKEN, "", {
-    maxAge: 0,
-    path: "/api/auth",
-  });
-}
+import { COOKIE_ACCESS_TOKEN } from "./auth.constants";
 
 // Route-handler guard. Reads the access_token cookie, verifies the JWT,
 // and injects the userId into the handler.

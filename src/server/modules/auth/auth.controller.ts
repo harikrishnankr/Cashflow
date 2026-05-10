@@ -15,7 +15,7 @@ import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
   clearAuthCookies,
-} from "./auth.middleware";
+} from "./auth.utils";
 import { extractMeta, parseAndValidate } from "@/server/utils/validator.utils";
 import { unwrap } from "./auth.utils";
 import {

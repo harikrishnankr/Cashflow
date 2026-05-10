@@ -2,9 +2,10 @@ import { InternalServerError, RateLimitedError } from "@/lib/errors";
 import { hash, verify } from "argon2";
 import { EmailTakenError, InvalidCredentialsError } from "./auth.errors";
 import { TokenUser } from "./auth.types";
-import { ACCESS_TTL_MS } from "./auth.constants";
+import { ACCESS_TTL_MS, COOKIE_ACCESS_TOKEN, COOKIE_REFRESH_TOKEN } from "./auth.constants";
 import { SignJWT } from "jose";
 import { AuthResult } from "@/schema/auth";
+import { NextResponse } from "next/server";
 
 export function unwrap<T>(result: AuthResult<T>): T {
   if (result.ok) return result.data;
@@ -65,3 +66,32 @@ export async function hashToken(raw: string): Promise<string> {
     b.toString(16).padStart(2, "0"),
   ).join("");
 }
+
+export function accessTokenCookieOptions(ttlMs: number) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: Math.floor(ttlMs / 1000),
+  };
+}
+
+export function refreshTokenCookieOptions(ttlMs: number) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/api/auth", // scoped — only sent to the auth refresh endpoint
+    maxAge: Math.floor(ttlMs / 1000),
+  };
+}
+
+export function clearAuthCookies(response: NextResponse) {
+  response.cookies.set(COOKIE_ACCESS_TOKEN, "", { maxAge: 0, path: "/" });
+  response.cookies.set(COOKIE_REFRESH_TOKEN, "", {
+    maxAge: 0,
+    path: "/api/auth",
+  });
+}
+
