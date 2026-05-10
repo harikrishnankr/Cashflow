@@ -1,10 +1,32 @@
 import { userRepository } from "./user.repository";
 import { UserNotFoundError } from "./user.errors";
-import type { User, CreateUserDto, UpdateUserDto } from "@/schema/user";
+import type { User, UserProfile, CreateUserDto, UpdateUserDto, OnboardingDto, IncomeSource } from "@/schema/user";
+import type { User as PrismaUser } from "@prisma/client";
+
+function toProfile(user: PrismaUser): UserProfile {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    avatarUrl: user.avatarUrl ?? undefined,
+    currency: user.currency,
+    timezone: user.timezone,
+    hasOnBoarded: user.hasOnBoarded,
+    primaryIncomeSource: (user.primaryIncomeSource as IncomeSource) ?? undefined,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt.toISOString(),
+  };
+}
 
 export const userService = {
   async list(options?: { page?: number; pageSize?: number }) {
     return userRepository.findAll(options);
+  },
+
+  async getMe(id: string): Promise<UserProfile> {
+    const user = await userRepository.findById(id);
+    if (!user) throw new UserNotFoundError(id);
+    return toProfile(user);
   },
 
   async getById(id: string): Promise<User> {
@@ -48,6 +70,13 @@ export const userService = {
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };
+  },
+
+  async completeOnboarding(id: string, data: OnboardingDto): Promise<UserProfile> {
+    const existing = await userRepository.findById(id);
+    if (!existing) throw new UserNotFoundError(id);
+    const user = await userRepository.completeOnboarding(id, data);
+    return toProfile(user);
   },
 
   async delete(id: string): Promise<void> {

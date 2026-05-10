@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { CreateUserDto, UpdateUserDto } from "@/schema/user";
+import type { CreateUserDto, OnboardingDto, UpdateUserDto } from "@/schema/user";
 
 export const userRepository = {
   async findAll(options?: { page?: number; pageSize?: number }) {
@@ -25,6 +25,18 @@ export const userRepository = {
 
   async update(id: string, data: UpdateUserDto) {
     return prisma.user.update({ where: { id }, data });
+  },
+
+  async completeOnboarding(id: string, data: OnboardingDto) {
+    return prisma.user.update({
+      where: { id },
+      data: {
+        currency: data.currency,
+        primaryIncomeSource: data.incomeSource,
+        ...(data.timezone && { timezone: data.timezone }),
+        hasOnBoarded: true,
+      },
+    });
   },
 
   async delete(id: string) {

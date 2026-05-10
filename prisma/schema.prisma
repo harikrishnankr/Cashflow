@@ -106,7 +106,8 @@ model User {
   timezone String @default("UTC") @db.VarChar(50)
 
   // Onboarding state
-  hasOnBoarded Boolean @default(false)
+  hasOnBoarded         Boolean      @default(false)
+  primaryIncomeSource  IncomeSource?
 
   // Account state
   emailVerifiedAt DateTime?

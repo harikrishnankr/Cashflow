@@ -1,40 +1,15 @@
 import { NextRequest } from "next/server";
-import { userService } from "@/server/modules/user";
 import { logger } from "@/lib/logger";
 import { ok, error } from "@/lib/response";
-import type { User } from "@/schema/user";
+import { userController } from "@/server/modules/user";
+import { withAuth } from "@/server/modules/auth/auth.middleware";
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const page = Number(searchParams.get("page") ?? 1);
-  const pageSize = Number(searchParams.get("pageSize") ?? 20);
-
-  logger.info("GET /api/user", { page, pageSize });
-
+export const GET = withAuth(async (req: NextRequest, userId: string) => {
   try {
-    const result = await userService.list({ page, pageSize });
-    logger.info("Users fetched", { total: result.total, page, pageSize });
-    return ok(result);
+    const profile = await userController.getUser(req, userId);
+    logger.info("User fetched", { userId });
+    return ok(profile);
   } catch (err) {
-    return error(err, "Failed to fetch users.", { page, pageSize });
+    return error(err, "Failed to fetch user.");
   }
-}
-
-export async function POST(request: NextRequest) {
-  logger.info("POST /api/user");
-
-  const body = await request.json().catch(() => null);
-
-  if (!body) {
-    logger.warn("Create user rejected: invalid request body");
-    return error("BAD_REQUEST", "Invalid request body.", 400);
-  }
-
-  try {
-    const user = await userService.create(body);
-    logger.info("User created", { userId: user.id, email: user.email });
-    return ok<User>(user, 201);
-  } catch (err) {
-    return error(err, "Failed to create user.");
-  }
-}
+});
