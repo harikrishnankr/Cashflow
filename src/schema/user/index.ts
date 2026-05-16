@@ -9,6 +9,14 @@ export type IncomeSource =
   | "GIFT"
   | "OTHER";
 
+export type RecurringFrequency =
+  | "DAILY"
+  | "WEEKLY"
+  | "BIWEEKLY"
+  | "MONTHLY"
+  | "QUARTERLY"
+  | "YEARLY";
+
 export type User = {
   id: string;
   email: string;
@@ -27,7 +35,6 @@ export type UserProfile = {
   currency: string;
   timezone: string;
   hasOnBoarded: boolean;
-  primaryIncomeSource?: IncomeSource;
   createdAt: string;
   updatedAt: string;
 };
@@ -45,8 +52,18 @@ export type UpdateUserDto = {
   role?: UserRole;
 };
 
+export type OnboardingRecurringIncome = {
+  source: IncomeSource;
+  description: string;
+  amount: number;
+  frequency: RecurringFrequency;
+  startDate: string;
+  notes?: string;
+  reminderDaysBefore?: number;
+};
+
 export type OnboardingDto = {
   currency: string;
-  incomeSource: IncomeSource;
   timezone?: string;
+  recurringIncomes: OnboardingRecurringIncome[];
 };

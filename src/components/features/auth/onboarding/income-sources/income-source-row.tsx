@@ -1,11 +1,12 @@
 "use client";
 
 import { X } from "lucide-react";
-import { FREQUENCIES, type IncomeSource } from "./constants";
 import { Input, Select } from "@/components/ui";
+import { FREQUENCIES } from "@/schema/user/income.constants";
+import { IncomeSourceData } from "./constants";
 
 interface IncomeSourceRowProps {
-  source: IncomeSource;
+  source: IncomeSourceData;
   amount: string;
   onAmountChange: (v: string) => void;
   frequency: string;
@@ -55,8 +56,8 @@ export function IncomeSourceRow({
         onChange={(e) => onFrequencyChange(e.target.value)}
       >
         {FREQUENCIES.map((f) => (
-          <option key={f.value} value={f.value}>
-            {f.label}
+          <option key={f} value={f}>
+            {f}
           </option>
         ))}
       </Select>

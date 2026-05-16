@@ -1,6 +1,6 @@
 import { userRepository } from "./user.repository";
 import { UserNotFoundError } from "./user.errors";
-import type { User, UserProfile, CreateUserDto, UpdateUserDto, OnboardingDto, IncomeSource } from "@/schema/user";
+import type { User, UserProfile, CreateUserDto, UpdateUserDto, OnboardingDto } from "@/schema/user";
 import type { User as PrismaUser } from "@prisma/client";
 
 function toProfile(user: PrismaUser): UserProfile {
@@ -12,7 +12,6 @@ function toProfile(user: PrismaUser): UserProfile {
     currency: user.currency,
     timezone: user.timezone,
     hasOnBoarded: user.hasOnBoarded,
-    primaryIncomeSource: (user.primaryIncomeSource as IncomeSource) ?? undefined,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
   };

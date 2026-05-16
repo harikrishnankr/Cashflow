@@ -59,7 +59,7 @@ class AuthController {
 
     logger.info("User registered", { userId: session.user.id });
 
-    return ok<AuthSession>(session, 201);
+    return ok(session, 201);
   }
 
   async logout(req: NextRequest) {

@@ -36,11 +36,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (isFetching) return;
-    console.log(session)
     const authenticated = isAuthenticated();
     const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
-    if (authenticated && session?.user.hasOnBoarded) {
+    if (authenticated && session?.user?.hasOnBoarded) {
       if (isPublic || pathname.startsWith("/onboarding")) {
         router.replace("/dashboard");
       }

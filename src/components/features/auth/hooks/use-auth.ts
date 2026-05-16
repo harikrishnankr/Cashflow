@@ -8,7 +8,7 @@ import type {
   RegisterCredentials,
   AuthSession,
 } from "@/schema/auth";
-import { UserProfile } from "@/schema/user";
+import { OnboardingDto, UserProfile } from "@/schema/user";
 
 export function useLogin() {
   const setSession = useAuthStore((s) => s.setSession);
@@ -21,15 +21,12 @@ export function useLogin() {
 }
 
 export function useRegister() {
-  const setSession = useAuthStore((s) => s.setSession);
-
   return useMutation({
     mutationFn: (credentials: RegisterCredentials) =>
       http<AuthSession>("/auth/register", {
         method: "POST",
         body: credentials,
       }),
-    onSuccess: (session) => setSession(session),
   });
 }
 
@@ -50,12 +47,21 @@ export function useUser() {
   });
 }
 
+export function useOnboarding() {
+  const setSession = useAuthStore((s) => s.setSession);
+
+  return useMutation({
+    mutationFn: (payload: OnboardingDto) =>
+      http<UserProfile>("/user/onboarding", { method: "POST", body: payload }),
+    onSuccess: (session) => setSession({ user: session }),
+  });
+}
 
 export function useSession() {
   const session = useAuthStore((s) => s.session);
   const setSession = useAuthStore((s) => s.setSession);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const clearSession = useAuthStore(s => s.clearSession);
+  const clearSession = useAuthStore((s) => s.clearSession);
 
   return {
     session,

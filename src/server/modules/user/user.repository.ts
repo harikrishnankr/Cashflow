@@ -28,14 +28,31 @@ export const userRepository = {
   },
 
   async completeOnboarding(id: string, data: OnboardingDto) {
-    return prisma.user.update({
-      where: { id },
-      data: {
-        currency: data.currency,
-        primaryIncomeSource: data.incomeSource,
-        ...(data.timezone && { timezone: data.timezone }),
-        hasOnBoarded: true,
-      },
+    return prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: {
+          currency: data.currency,
+          ...(data.timezone && { timezone: data.timezone }),
+          hasOnBoarded: true,
+        },
+      });
+
+      await tx.recurringIncome.createMany({
+        data: data.recurringIncomes.map((income) => ({
+          userId: id,
+          amount: income.amount,
+          source: income.source,
+          description: income.description,
+          notes: income.notes,
+          frequency: income.frequency,
+          startDate: new Date(income.startDate),
+          nextDueDate: new Date(income.startDate),
+          reminderDaysBefore: income.reminderDaysBefore ?? 3,
+        })),
+      });
+
+      return user;
     });
   },
 

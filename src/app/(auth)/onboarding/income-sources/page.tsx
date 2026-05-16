@@ -6,11 +6,11 @@ import { Button } from "@/components/ui";
 import {
   PageFooter,
   IncomeSourceCard,
-  IncomeSourceRow,
-  INCOME_SOURCES,
+  IncomeSourceRow
 } from "@/components/features/auth";
 import { useOnboardingData } from "@/components/features/auth/onboarding/onboarding-provider";
 import { CURRENCIES } from "@/components/features/auth/onboarding/currency-and-locale/constants";
+import { INCOME_SOURCES_DATA } from "@/components/features/auth/onboarding/income-sources/constants";
 
 export default function IncomeSourcesPage() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function IncomeSourcesPage() {
     CURRENCIES.find((c) => c.value === currency)?.glyph ?? currency;
 
   // Exclude "custom" from the detail rows
-  const detailSources = INCOME_SOURCES.filter(
+  const detailSources = INCOME_SOURCES_DATA.filter(
     (s) => s.id !== "custom" && selectedSources.includes(s.id),
   );
 
@@ -44,7 +44,9 @@ export default function IncomeSourcesPage() {
     })
     .split(".");
 
-  const handleContinue = () => router.push("/onboarding/setup-finish");
+  const handleContinue = async () => {
+    router.push("/onboarding/setup-finish")
+  };
 
   return (
     <>
@@ -64,7 +66,7 @@ export default function IncomeSourcesPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-        {INCOME_SOURCES.map((source) => (
+        {INCOME_SOURCES_DATA.map((source) => (
           <IncomeSourceCard
             key={source.id}
             source={source}

@@ -13,7 +13,6 @@ export const authRepository = {
         currency: true,
         timezone: true,
         hasOnBoarded: true,
-        primaryIncomeSource: true,
         updatedAt: true,
         createdAt: true,
       },

@@ -1,12 +1,12 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
-import type { AuthSession } from "@/schema/auth";
+import type { SessionClaims } from "@/schema/auth";
 import { COOKIE_ACCESS_TOKEN } from "@/server/modules/auth";
 
 // Verifies the access_token cookie and returns the session without a DB round-trip.
 // Returns null if the token is absent, invalid, or expired.
-export async function getSession(): Promise<AuthSession | null> {
+export async function getSession(): Promise<{ user: SessionClaims } | null> {
   const store = await cookies();
   const token = store.get(COOKIE_ACCESS_TOKEN)?.value;
   if (!token) return null;

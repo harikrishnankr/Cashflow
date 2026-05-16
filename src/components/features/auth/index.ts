@@ -15,7 +15,7 @@ export { WelcomePreviewCard } from "./onboarding/welcome/welcome-preview-card";
 export { WelcomeValueList } from "./onboarding/welcome/welcome-value-list";
 export { OnboardingProvider } from "./onboarding/onboarding-provider";
 export { CurrencyGrid } from "./onboarding/currency-and-locale/currency-grid";
-export { IncomeSourceCard, IncomeSourceRow, INCOME_SOURCES, FREQUENCIES } from "./onboarding/income-sources";
+export { IncomeSourceCard, IncomeSourceRow } from "./onboarding/income-sources";
 
 export { useLogin, useRegister, useLogout } from "./hooks/use-auth";
 

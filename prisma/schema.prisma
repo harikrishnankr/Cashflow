@@ -106,8 +106,7 @@ model User {
   timezone String @default("UTC") @db.VarChar(50)
 
   // Onboarding state
-  hasOnBoarded         Boolean      @default(false)
-  primaryIncomeSource  IncomeSource?
+  hasOnBoarded Boolean @default(false)
 
   // Account state
   emailVerifiedAt DateTime?
@@ -252,16 +251,18 @@ model Income {
 }
 
 model RecurringIncome {
-  id          Int                @id @default(autoincrement())
-  userId      String             @db.Uuid
-  amount      Decimal            @db.Decimal(12, 2)
-  source      IncomeSource
-  description String
-  frequency   RecurringFrequency
-  startDate   DateTime           @db.Date
-  endDate     DateTime?          @db.Date
-  nextDueDate DateTime           @db.Date
-  isActive    Boolean            @default(true)
+  id                 Int                @id @default(autoincrement())
+  userId             String             @db.Uuid
+  amount             Decimal            @db.Decimal(12, 2)
+  source             IncomeSource
+  description        String
+  notes              String?            @db.Text
+  frequency          RecurringFrequency
+  startDate          DateTime           @db.Date
+  endDate            DateTime?          @db.Date
+  nextDueDate        DateTime           @db.Date
+  isActive           Boolean            @default(true)
+  reminderDaysBefore Int                @default(3)
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   incomes Income[]

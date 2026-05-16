@@ -66,7 +66,6 @@ export async function loginUser(
           currency: user.currency,
           timezone: user.timezone,
           hasOnBoarded: user.hasOnBoarded,
-          primaryIncomeSource: user.primaryIncomeSource || undefined,
           updatedAt: user.updatedAt.toISOString(),
           createdAt: user.createdAt.toISOString(),
         },

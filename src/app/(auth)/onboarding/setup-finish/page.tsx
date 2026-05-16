@@ -1,46 +1,31 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Check, Plus, Target } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useOnboardingData } from "@/components/features/auth/onboarding/onboarding-provider";
 import { CURRENCIES } from "@/components/features/auth/onboarding/currency-and-locale/constants";
-import { INCOME_SOURCES } from "@/components/features/auth/onboarding/income-sources/constants";
-
-const QUICK_ACTIONS = [
-  {
-    icon: Plus,
-    title: "Add an expense",
-    hint: (
-      <>
-        Press{" "}
-        <kbd className="font-mono bg-(--paper-2) border border-(--hairline) rounded px-1 py-px text-[10px] not-italic">
-          A
-        </kbd>{" "}
-        anywhere
-      </>
-    ),
-    href: "#",
-  },
-  {
-    icon: Target,
-    title: "Set a monthly budget",
-    hint: "Optional · advisory only",
-    href: "#",
-  },
-] as const;
+import { INCOME_SOURCES_DATA } from "@/components/features/auth/onboarding/income-sources/constants";
+import { useOnboarding } from "@/components/features/auth/hooks/use-auth";
+import { IncomeSource, RecurringFrequency } from "@/schema/user";
 
 export default function SetupFinishPage() {
   const router = useRouter();
-  const { currency, locale, selectedSources, incomeAmounts } =
-    useOnboardingData();
+  const {
+    currency,
+    locale,
+    selectedSources,
+    incomeAmounts,
+    incomeFrequencies,
+  } = useOnboardingData();
+  const onboardingMutation = useOnboarding();
 
   const currencyGlyph =
     CURRENCIES.find((c) => c.value === currency)?.glyph ?? currency;
 
   const sourceCount = selectedSources.filter((id) => id !== "custom").length;
 
-  const total = INCOME_SOURCES.filter(
+  const total = INCOME_SOURCES_DATA.filter(
     (s) => s.id !== "custom" && selectedSources.includes(s.id),
   ).reduce((sum, s) => {
     const raw = incomeAmounts[s.id]?.replace(/,/g, "") ?? "";
@@ -58,6 +43,28 @@ export default function SetupFinishPage() {
     { label: "Income sources", value: String(sourceCount) },
     { label: "Est. monthly", value: totalStr, highlight: true },
   ];
+
+  const detailSources = INCOME_SOURCES_DATA.filter(
+    (s) => s.id !== "custom" && selectedSources.includes(s.id),
+  );
+
+  const finishOnboarding = async () => {
+    try {
+      await onboardingMutation.mutateAsync({
+        currency,
+        recurringIncomes: detailSources.map((source) => ({
+          source: source.id as IncomeSource,
+          description: "Income Source",
+          amount: parseFloat(incomeAmounts[source.id]),
+          frequency:
+            (incomeFrequencies[source.id] as RecurringFrequency) ??
+            source.defaultFrequency,
+          startDate: new Date().toISOString().slice(0, 10),
+        })),
+      });
+      router.push("/dashboard");
+    } catch {}
+  };
 
   return (
     <>
@@ -123,59 +130,7 @@ export default function SetupFinishPage() {
           ))}
         </div>
 
-        {/* Action links */}
-        <div className="flex flex-col gap-2 mb-8">
-          {[
-            {
-              icon: Plus,
-              title: "Add your first expense",
-              hint: "The main move. Start here.",
-              href: "#",
-            },
-            {
-              icon: Target,
-              title: "Set a monthly budget",
-              hint: "Optional · advisory only.",
-              href: "#",
-            },
-          ].map(({ icon: Icon, title, hint, href }) => (
-            <a
-              key={title}
-              href={href}
-              className="flex items-center gap-3 rounded-(--r-md) px-3.5 py-3.5 no-underline"
-              style={{
-                background: "rgba(250,247,242,0.06)",
-                border: "1px solid rgba(250,247,242,0.1)",
-                color: "var(--paper)",
-              }}
-            >
-              <div
-                className="w-7.5 h-7.5 rounded-lg flex items-center justify-center text-(--orange) shrink-0"
-                style={{ background: "rgba(250,247,242,0.08)" }}
-              >
-                <Icon size={15} />
-              </div>
-              <div className="flex-1">
-                <div className="text-[13px] font-medium text-(--paper)">
-                  {title}
-                </div>
-                <div
-                  className="text-[11px] mt-0.5"
-                  style={{ color: "rgba(250,247,242,0.55)" }}
-                >
-                  {hint}
-                </div>
-              </div>
-              <ArrowRight
-                size={16}
-                style={{ color: "rgba(250,247,242,0.55)" }}
-                className="shrink-0"
-              />
-            </a>
-          ))}
-        </div>
-
-        <Button fullWidth onClick={() => router.push("/dashboard")}>
+        <Button fullWidth onClick={finishOnboarding}>
           Open my dashboard <ArrowRight size={16} />
         </Button>
       </div>
@@ -203,15 +158,9 @@ export default function SetupFinishPage() {
               head straight to the dashboard to get started.
             </p>
             <div className="flex items-center gap-4">
-              <Button onClick={() => router.push("/dashboard")}>
+              <Button onClick={finishOnboarding}>
                 Go to dashboard <ArrowRight size={16} />
               </Button>
-              <button
-                type="button"
-                className="text-sm text-(--ink-3) hover:text-(--orange) transition-colors cursor-pointer"
-              >
-                Add first expense
-              </button>
             </div>
           </div>
 
@@ -237,25 +186,6 @@ export default function SetupFinishPage() {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Quick actions */}
-        <div className="grid grid-cols-3 gap-3.5 mt-10">
-          {QUICK_ACTIONS.map(({ icon: Icon, title, hint, href }) => (
-            <a
-              key={title}
-              href={href}
-              className="bg-(--card) border border-(--hairline) rounded-(--r-md) p-4.5 block hover:bg-(--paper-2) transition-colors no-underline"
-            >
-              <div className="w-8.5 h-8.5 rounded-lg bg-(--paper-2) border border-(--hairline) flex items-center justify-center text-(--ink) mb-3">
-                <Icon size={17} />
-              </div>
-              <div className="text-sm font-medium text-(--ink)">{title}</div>
-              <div className="text-xs text-(--ink-3) mt-0.5 leading-snug">
-                {hint}
-              </div>
-            </a>
-          ))}
         </div>
 
         {/* Nav row */}
