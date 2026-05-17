@@ -24,6 +24,27 @@ export async function parseAndValidate<S extends z.ZodTypeAny>(
   return parsed.data;
 }
 
+export function parseQuery<S extends z.ZodTypeAny>(
+  req: NextRequest,
+  schema: S,
+): z.infer<S> {
+  const { searchParams } = new URL(req.url);
+  const raw = Object.fromEntries(searchParams.entries());
+
+  const parsed = schema.safeParse(raw);
+
+  if (!parsed.success) {
+    throw new ValidationError(
+      "Invalid query parameters.",
+      Object.fromEntries(
+        parsed.error.issues.map((i) => [i.path.join("."), i.message]),
+      ),
+    );
+  }
+
+  return parsed.data;
+}
+
 export function extractMeta(req: NextRequest) {
   return {
     userAgent: req.headers.get("user-agent") ?? undefined,

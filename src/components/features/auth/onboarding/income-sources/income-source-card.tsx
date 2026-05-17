@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckboxCard } from "@/components/ui";
-import type { IncomeSource } from "./constants";
+import type { IncomeSourceData as IncomeSource } from "./constants";
 
 interface IncomeSourceCardProps {
   source: IncomeSource;

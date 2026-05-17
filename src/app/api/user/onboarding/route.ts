@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { logger } from "@/lib/logger";
 import { ok, error } from "@/lib/response";
 import { userController } from "@/server/modules/user";
-import { withAuth } from "@/server/modules/auth/auth.middleware";
+import { withAuth } from "@/server/modules/auth";
 
 export const POST = withAuth(async (req: NextRequest, userId: string) => {
   try {
