@@ -27,7 +27,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       ref={dialogRef}
       onClose={onClose}
       className={cn(
-        "bg-(--paper) rounded-(--r-lg) p-6 shadow-(--shadow-lg) w-full max-w-lg",
+        "bg-(--paper) rounded-(--r-lg) p-6 shadow-(--shadow-lg) w-full max-w-lg m-auto",
         "backdrop:bg-black/50 backdrop:backdrop-blur-sm",
         "open:flex open:flex-col open:gap-4",
         className

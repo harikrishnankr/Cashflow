@@ -9,7 +9,7 @@ import {
   createRecurringExpenseSchema,
   updateRecurringExpenseSchema,
 } from "@/schema/transaction/recurring.schema";
-import { listTransactionsSchema, listRecurringSchema } from "@/schema/transaction/query.schema";
+import { transactionStatsSchema, listTransactionsSchema, listRecurringSchema } from "@/schema/transaction/query.schema";
 
 class TransactionController {
   // ── Transactions ─────────────────────────────────────────────────────
@@ -17,6 +17,11 @@ class TransactionController {
   async listTransactions(req: NextRequest, userId: string) {
     const query = parseQuery(req, listTransactionsSchema);
     return transactionService.listTransactions(userId, query);
+  }
+
+  async getTransactionStats(req: NextRequest, userId: string) {
+    const query = parseQuery(req, transactionStatsSchema);
+    return transactionService.getTransactionStats(userId, query);
   }
 
   async getIncome(userId: string, id: number) {

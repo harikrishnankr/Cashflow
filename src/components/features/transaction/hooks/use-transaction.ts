@@ -12,12 +12,29 @@ import type {
   CreateRecurringExpenseFormValues,
   UpdateRecurringExpenseFormValues,
   TransactionListResponse,
+  TransactionStats,
   RecurringListResponse,
   IncomeDto,
   ExpenseDto,
   RecurringIncomeDto,
   RecurringExpenseDto,
 } from "@/schema/transaction";
+
+export function useExpense(id: number) {
+  return useQuery({
+    queryKey: ["transactions", "expense", id],
+    queryFn: () => http<ExpenseDto>(`/transaction/expense/${id}`),
+    enabled: id > 0,
+  });
+}
+
+export function useIncome(id: number) {
+  return useQuery({
+    queryKey: ["transactions", "income", id],
+    queryFn: () => http<IncomeDto>(`/transaction/income/${id}`),
+    enabled: id > 0,
+  });
+}
 
 // ─── Query-param helper ────────────────────────────────────────────────────
 
@@ -50,6 +67,23 @@ export function useTransactions(params: TransactionListParams = {}) {
     queryKey: ["transactions", params],
     queryFn: () =>
       http<TransactionListResponse>(`/transaction${toSearchParams(params)}`),
+  });
+}
+
+export type TransactionStatsParams = {
+  type?: "income" | "expense";
+  dateFrom?: string;
+  dateTo?: string;
+  source?: string;
+  category?: string;
+  search?: string;
+};
+
+export function useTransactionStats(params: TransactionStatsParams = {}) {
+  return useQuery({
+    queryKey: ["transactions", "stats", params],
+    queryFn: () =>
+      http<TransactionStats>(`/transaction/stats${toSearchParams(params)}`),
   });
 }
 

@@ -38,7 +38,7 @@ export const INCOME_SOURCE_LABELS: Record<IncomeSourceValue, string> = {
   BUSINESS: "Business",
   GIFT: "Gift / Other",
   OTHER: "Other",
-};
+} as const;
 
 export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   FOOD: "Food & Dining",
@@ -54,7 +54,7 @@ export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   INVESTMENTS: "Investments",
   SAVINGS: "Savings",
   OTHER: "Other",
-};
+} as const;
 
 export const FREQUENCY_LABELS: Record<FrequencyValue, string> = {
   DAILY: "Daily",

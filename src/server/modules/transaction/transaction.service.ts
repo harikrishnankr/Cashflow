@@ -8,13 +8,17 @@ import type {
   CreateRecurringExpenseInput,
   UpdateRecurringExpenseInput,
 } from "@/schema/transaction/recurring.schema";
-import type { ListTransactionsQuery, ListRecurringQuery } from "@/schema/transaction";
+import type { ListTransactionsQuery, ListRecurringQuery, TransactionStatsQuery } from "@/schema/transaction";
 
 export const transactionService = {
   // ── Transactions ───────────────────────────────────────────────────────
 
   async listTransactions(userId: string, query: ListTransactionsQuery) {
     return transactionRepository.listTransactions(userId, query);
+  },
+
+  async getTransactionStats(userId: string, query: TransactionStatsQuery) {
+    return transactionRepository.getTransactionStats(userId, query);
   },
 
   async getIncome(id: number, userId: string) {

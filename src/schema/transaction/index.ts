@@ -34,8 +34,16 @@ export type {
   CreateRecurringExpenseInput,
   UpdateRecurringExpenseInput,
 } from "./recurring.schema";
-export { listTransactionsSchema, listRecurringSchema } from "./query.schema";
-export type { ListTransactionsQuery, ListRecurringQuery } from "./query.schema";
+export {
+  transactionStatsSchema,
+  listTransactionsSchema,
+  listRecurringSchema,
+} from "./query.schema";
+export type {
+  TransactionStatsQuery,
+  ListTransactionsQuery,
+  ListRecurringQuery,
+} from "./query.schema";
 
 // ─── Transaction form value types ─────────────────────────────────────────
 
@@ -221,4 +229,14 @@ export type RecurringExpenseDto = {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type TransactionTypeFilter = "all" | "income" | "expense";
+export type SortValue = "date:desc" | "date:asc" | "createdAt:desc" | "createdAt:asc";
+
+export type TransactionStats = {
+  income: number;
+  spending: number;
+  net: number;
+  count: number;
 };

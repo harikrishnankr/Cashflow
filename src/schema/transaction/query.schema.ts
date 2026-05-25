@@ -2,6 +2,17 @@ import z from "zod";
 import { INCOME_SOURCES } from "@/schema/user/income.constants";
 import { EXPENSE_CATEGORIES } from "./constants";
 
+export const transactionStatsSchema = z.object({
+  type: z.enum(["income", "expense"]).optional(),
+  dateFrom: z.iso.date().optional(),
+  dateTo: z.iso.date().optional(),
+  source: z.enum(INCOME_SOURCES).optional(),
+  category: z.enum(EXPENSE_CATEGORIES).optional(),
+  search: z.string().max(100).optional(),
+});
+
+export type TransactionStatsQuery = z.infer<typeof transactionStatsSchema>;
+
 export const listTransactionsSchema = z.object({
   type: z.enum(["income", "expense"]).optional(),
   page: z.coerce.number().int().positive().default(1),

@@ -11,6 +11,8 @@ import type {
 import type {
   ListTransactionsQuery,
   ListRecurringQuery,
+  TransactionStatsQuery,
+  TransactionStats,
   TransactionListItem,
   IncomeListItem,
   ExpenseListItem,
@@ -161,6 +163,65 @@ export const transactionRepository = {
       pageSize: q.pageSize,
       totalPages: Math.ceil(total / q.pageSize),
     };
+  },
+
+  // ── Stats (filter-aware totals, no pagination) ─────────────────────────
+
+  async getTransactionStats(userId: string, q: TransactionStatsQuery): Promise<TransactionStats> {
+    const dateFrom = q.dateFrom ? new Date(q.dateFrom) : null;
+    const dateTo = q.dateTo ? new Date(q.dateTo) : null;
+    const searchPattern = q.search ? `%${q.search}%` : null;
+    const sourceVal = q.source ?? null;
+    const categoryVal = q.category ?? null;
+
+    const incomeArm = Prisma.sql`
+      SELECT 'income'::text AS type, amount
+      FROM incomes
+      WHERE "userId"    = ${userId}::uuid
+        AND "deletedAt" IS NULL
+        AND (${dateFrom}::date  IS NULL OR date        >= ${dateFrom}::date)
+        AND (${dateTo}::date    IS NULL OR date        <= ${dateTo}::date)
+        AND (${sourceVal}::text IS NULL OR source::text = ${sourceVal}::text)
+        AND (
+          ${searchPattern}::text IS NULL
+          OR notes        ILIKE ${searchPattern}
+          OR amount::text ILIKE ${searchPattern}
+        )`;
+
+    const expenseArm = Prisma.sql`
+      SELECT 'expense'::text AS type, amount
+      FROM expenses
+      WHERE "userId"      = ${userId}::uuid
+        AND "deletedAt"   IS NULL
+        AND (${dateFrom}::date    IS NULL OR date          >= ${dateFrom}::date)
+        AND (${dateTo}::date      IS NULL OR date          <= ${dateTo}::date)
+        AND (${categoryVal}::text IS NULL OR category::text = ${categoryVal}::text)
+        AND (
+          ${searchPattern}::text IS NULL
+          OR notes        ILIKE ${searchPattern}
+          OR amount::text ILIKE ${searchPattern}
+        )`;
+
+    const dataArm =
+      q.type === "income"
+        ? incomeArm
+        : q.type === "expense"
+          ? expenseArm
+          : Prisma.sql`${incomeArm} UNION ALL ${expenseArm}`;
+
+    type StatsRow = { income: string; spending: string; count: number };
+
+    const [row] = await prisma.$queryRaw<StatsRow[]>(Prisma.sql`
+      SELECT
+        COALESCE(SUM(CASE WHEN type = 'income'  THEN amount ELSE 0 END), 0)::numeric AS income,
+        COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0)::numeric AS spending,
+        COUNT(*)::int AS count
+      FROM (${dataArm}) AS combined
+    `);
+
+    const income = parseFloat(row?.income ?? "0");
+    const spending = parseFloat(row?.spending ?? "0");
+    return { income, spending, net: income - spending, count: row?.count ?? 0 };
   },
 
   // ── Income CRUD ────────────────────────────────────────────────────────
