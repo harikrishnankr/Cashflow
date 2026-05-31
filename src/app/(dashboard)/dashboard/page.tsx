@@ -1,3 +1,4 @@
+import { HeadingTitle } from "@/components/layout/heading-title";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Dashboard · CashFlow" };
@@ -6,12 +7,9 @@ export default function DashboardPage() {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1
-          className="text-[2rem] font-normal tracking-[-0.02em] m-0"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
+        <HeadingTitle>
           Dashboard
-        </h1>
+        </HeadingTitle>
         <p className="text-(--ink-3) mt-1">Here&apos;s your financial overview for April 2026.</p>
       </div>
 

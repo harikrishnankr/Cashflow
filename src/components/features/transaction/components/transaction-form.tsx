@@ -3,7 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Button, Input, Select, Form, FormFieldError, DateTimePicker, BackLink } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Select,
+  Form,
+  FormFieldError,
+  DateTimePicker,
+  BackLink,
+} from "@/components/ui";
 import {
   EXPENSE_CATEGORIES,
   INCOME_SOURCES,
@@ -11,8 +19,14 @@ import {
   INCOME_SOURCE_LABELS,
 } from "@/schema/transaction";
 import type { ExpenseCategory, IncomeSourceValue } from "@/schema/transaction";
-import { useCreateExpense, useUpdateExpense, useCreateIncome, useUpdateIncome } from "../hooks/use-transaction";
+import {
+  useCreateExpense,
+  useUpdateExpense,
+  useCreateIncome,
+  useUpdateIncome,
+} from "../hooks/use-transaction";
 import { toDatetimeLocal, fromDatetimeLocal } from "../utils/format";
+import { HeadingTitle } from "@/components/layout/heading-title";
 
 type TransactionType = "income" | "expense";
 
@@ -35,10 +49,16 @@ function nowDatetimeLocal(): string {
   return toDatetimeLocal(new Date().toISOString());
 }
 
-export function TransactionForm({ mode, id, initialValues }: TransactionFormProps) {
+export function TransactionForm({
+  mode,
+  id,
+  initialValues,
+}: TransactionFormProps) {
   const router = useRouter();
 
-  const [type, setType] = useState<TransactionType>(initialValues?.type ?? "expense");
+  const [type, setType] = useState<TransactionType>(
+    initialValues?.type ?? "expense",
+  );
   const [category, setCategory] = useState<ExpenseCategory>(
     initialValues?.category ?? "FOOD",
   );
@@ -49,7 +69,9 @@ export function TransactionForm({ mode, id, initialValues }: TransactionFormProp
     initialValues?.amount ? String(initialValues.amount) : "",
   );
   const [datetime, setDatetime] = useState(
-    initialValues?.date ? toDatetimeLocal(initialValues.date) : nowDatetimeLocal(),
+    initialValues?.date
+      ? toDatetimeLocal(initialValues.date)
+      : nowDatetimeLocal(),
   );
   const [notes, setNotes] = useState(initialValues?.notes ?? "");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -90,32 +112,56 @@ export function TransactionForm({ mode, id, initialValues }: TransactionFormProp
     try {
       if (type === "expense") {
         if (mode === "add") {
-          await createExpense.mutateAsync({ category, amount: amountNum, date: isoDate, notes: notesVal });
+          await createExpense.mutateAsync({
+            category,
+            amount: amountNum,
+            date: isoDate,
+            notes: notesVal,
+          });
         } else {
-          await updateExpense.mutateAsync({ id: id!, category, amount: amountNum, date: isoDate, notes: notesVal });
+          await updateExpense.mutateAsync({
+            id: id!,
+            category,
+            amount: amountNum,
+            date: isoDate,
+            notes: notesVal,
+          });
         }
       } else {
         if (mode === "add") {
-          await createIncome.mutateAsync({ source, amount: amountNum, date: isoDate, notes: notesVal });
+          await createIncome.mutateAsync({
+            source,
+            amount: amountNum,
+            date: isoDate,
+            notes: notesVal,
+          });
         } else {
-          await updateIncome.mutateAsync({ id: id!, source, amount: amountNum, date: isoDate, notes: notesVal });
+          await updateIncome.mutateAsync({
+            id: id!,
+            source,
+            amount: amountNum,
+            date: isoDate,
+            notes: notesVal,
+          });
         }
       }
       router.push("/dashboard/transactions");
       router.refresh();
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Something went wrong.");
+      setServerError(
+        err instanceof Error ? err.message : "Something went wrong.",
+      );
     }
   }
 
   return (
     <div className="max-w-lg">
-      <BackLink onClick={() => router.back()} className="mb-6" />
+      <BackLink onClick={() => router.push("/dashboard/transactions")} className="mb-6" />
 
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-(--ink) mb-1">
+        <HeadingTitle>
           {mode === "add" ? "Add transaction" : "Edit transaction"}
-        </h1>
+        </HeadingTitle>
         <p className="text-sm text-(--ink-3)">
           {mode === "add"
             ? "Record a new income or expense."
@@ -141,8 +187,8 @@ export function TransactionForm({ mode, id, initialValues }: TransactionFormProp
                 {isPending
                   ? "Saving…"
                   : mode === "add"
-                  ? "Add transaction"
-                  : "Save changes"}
+                    ? "Add transaction"
+                    : "Save changes"}
               </Button>
             </div>
           }
@@ -213,7 +259,11 @@ export function TransactionForm({ mode, id, initialValues }: TransactionFormProp
               onChange={(e) => {
                 setAmount(e.target.value);
                 if (fieldErrors.amount) {
-                  setFieldErrors((prev) => { const n = { ...prev }; delete n.amount; return n; });
+                  setFieldErrors((prev) => {
+                    const n = { ...prev };
+                    delete n.amount;
+                    return n;
+                  });
                 }
               }}
               lead={<span className="text-sm font-mono">$</span>}
@@ -231,13 +281,22 @@ export function TransactionForm({ mode, id, initialValues }: TransactionFormProp
               onChange={(v) => {
                 setDatetime(v);
                 if (fieldErrors.datetime) {
-                  setFieldErrors((prev) => { const n = { ...prev }; delete n.datetime; return n; });
+                  setFieldErrors((prev) => {
+                    const n = { ...prev };
+                    delete n.datetime;
+                    return n;
+                  });
                 }
               }}
               aria-invalid={!!fieldErrors.datetime || undefined}
-              aria-describedby={fieldErrors.datetime ? "error-datetime" : undefined}
+              aria-describedby={
+                fieldErrors.datetime ? "error-datetime" : undefined
+              }
             />
-            <FormFieldError id="error-datetime" message={fieldErrors.datetime} />
+            <FormFieldError
+              id="error-datetime"
+              message={fieldErrors.datetime}
+            />
           </div>
 
           {/* Notes */}

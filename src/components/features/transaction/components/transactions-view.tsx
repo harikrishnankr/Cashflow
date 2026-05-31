@@ -16,6 +16,7 @@ import {
   TransactionListProvider,
   useTransactionList,
 } from "../context/transaction-list.provider";
+import { HeadingTitle } from "@/components/layout/heading-title";
 
 export function TransactionsView() {
   return (
@@ -85,9 +86,7 @@ function TransactionsContent() {
       {/* Header */}
       <div className="flex items-end justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-semibold text-(--ink) mb-0.5">
-            Transactions
-          </h1>
+          <HeadingTitle>Transactions</HeadingTitle>
           {!isLoading && (
             <p className="text-sm text-(--ink-3)">
               {total} transaction{total !== 1 ? "s" : ""}

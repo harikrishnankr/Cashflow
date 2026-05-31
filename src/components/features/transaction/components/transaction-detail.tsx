@@ -8,6 +8,7 @@ import type { ExpenseDto, IncomeDto } from "@/schema/transaction";
 import { TransactionTypeIcon } from "./transaction-type-icon";
 import { TransactionAmount } from "./transaction-amount";
 import { useDeleteExpense, useDeleteIncome } from "../hooks/use-transaction";
+import { HeadingTitle } from "@/components/layout/heading-title";
 
 interface TransactionDetailProps {
   transaction: ExpenseDto | IncomeDto;
@@ -66,9 +67,7 @@ export function TransactionDetail({ transaction, type }: TransactionDetailProps)
       {/* Page heading */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-(--ink) mb-0.5">
-            Transaction detail
-          </h1>
+          <HeadingTitle>Transaction detail</HeadingTitle>
           <p className="text-xs text-(--ink-3) font-mono uppercase tracking-(--ls-caps)">
             {type}-{transaction.id}
           </p>
