@@ -56,7 +56,8 @@ function TransactionsContent() {
     pageSize: 20,
   });
 
-  const { data: stats, isLoading: statsLoading } = useTransactionStats(filterParams);
+  const { data: stats, isLoading: statsLoading } =
+    useTransactionStats(filterParams);
 
   const deleteExpense = useDeleteExpense();
   const deleteIncome = useDeleteIncome();

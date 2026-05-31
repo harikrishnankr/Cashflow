@@ -41,9 +41,16 @@ function activeFilterCount(
 
 export function TransactionFilters() {
   const { state, dispatch } = useTransactionList();
-  const { search, typeFilter, dateFrom, dateTo, source, category, sort } = state;
+  const { search, typeFilter, dateFrom, dateTo, source, category, sort } =
+    state;
 
-  const extraCount = activeFilterCount(dateFrom, dateTo, source, category, sort);
+  const extraCount = activeFilterCount(
+    dateFrom,
+    dateTo,
+    source,
+    category,
+    sort,
+  );
   const showSource = typeFilter === "all" || typeFilter === "income";
   const showCategory = typeFilter === "all" || typeFilter === "expense";
 
@@ -57,7 +64,9 @@ export function TransactionFilters() {
           type="text"
           placeholder="Search by notes or amount…"
           value={search}
-          onChange={(e) => dispatch({ type: "SET_SEARCH", payload: e.target.value })}
+          onChange={(e) =>
+            dispatch({ type: "SET_SEARCH", payload: e.target.value })
+          }
           lead={<Search size={14} />}
           trail={
             search ? (
@@ -113,11 +122,15 @@ export function TransactionFilters() {
             containerClassName="shrink-0 w-36"
             aria-label="Source"
             value={source}
-            onChange={(e) => dispatch({ type: "SET_SOURCE", payload: e.target.value })}
+            onChange={(e) =>
+              dispatch({ type: "SET_SOURCE", payload: e.target.value })
+            }
           >
             <option value="">All sources</option>
             {Object.entries(INCOME_SOURCE_LABELS).map(([v, label]) => (
-              <option key={v} value={v}>{label}</option>
+              <option key={v} value={v}>
+                {label}
+              </option>
             ))}
           </Select>
         )}
@@ -128,11 +141,15 @@ export function TransactionFilters() {
             containerClassName="shrink-0 w-40"
             aria-label="Category"
             value={category}
-            onChange={(e) => dispatch({ type: "SET_CATEGORY", payload: e.target.value })}
+            onChange={(e) =>
+              dispatch({ type: "SET_CATEGORY", payload: e.target.value })
+            }
           >
             <option value="">All categories</option>
             {Object.entries(EXPENSE_CATEGORY_LABELS).map(([v, label]) => (
-              <option key={v} value={v}>{label}</option>
+              <option key={v} value={v}>
+                {label}
+              </option>
             ))}
           </Select>
         )}
@@ -142,10 +159,14 @@ export function TransactionFilters() {
           containerClassName="shrink-0 w-44"
           aria-label="Sort by"
           value={sort}
-          onChange={(e) => dispatch({ type: "SET_SORT", payload: e.target.value as SortValue })}
+          onChange={(e) =>
+            dispatch({ type: "SET_SORT", payload: e.target.value as SortValue })
+          }
         >
           {SORT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
           ))}
         </Select>
 

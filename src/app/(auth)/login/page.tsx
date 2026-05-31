@@ -23,7 +23,8 @@ export default function LoginPage() {
     try {
       await loginMutation.mutateAsync(credentials);
       refresh()
-    } catch {
+    } catch (error) {
+      console.log(error)
       // error is captured in loginMutation.error
     }
   }

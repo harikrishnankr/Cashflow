@@ -93,7 +93,7 @@ export async function http<T = unknown>(
     return await fetchJson<T>(path, options);
   } catch (err) {
     // Only intercept 401s, and never recurse on the refresh endpoint itself.
-    if (!(err instanceof HttpError) || err.status !== 401 || path === "/auth/refresh") {
+    if (!(err instanceof HttpError) || err.status !== 401 || path === "/auth/refresh" || path === "/auth/login") {
       throw err;
     }
 

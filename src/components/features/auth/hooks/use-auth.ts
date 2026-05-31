@@ -17,6 +17,9 @@ export function useLogin() {
     mutationFn: (credentials: LoginCredentials) =>
       http<AuthSession>("/auth/login", { method: "POST", body: credentials }),
     onSuccess: (session) => setSession(session),
+    onError: (error) => {
+      console.log("Login error:", error);
+    }
   });
 }
 

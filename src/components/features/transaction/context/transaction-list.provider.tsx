@@ -9,15 +9,18 @@ import {
 } from "react";
 import type { SortValue, TransactionTypeFilter } from "@/schema/transaction";
 
-function toISODate(d: Date): string {
-  return d.toISOString().slice(0, 10);
+function toLocalDateString(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 function currentMonthRange(): { dateFrom: string; dateTo: string } {
   const now = new Date();
   return {
-    dateFrom: toISODate(new Date(now.getFullYear(), now.getMonth(), 1)),
-    dateTo: toISODate(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+    dateFrom: toLocalDateString(new Date(now.getFullYear(), now.getMonth(), 1)),
+    dateTo: toLocalDateString(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
   };
 }
 
