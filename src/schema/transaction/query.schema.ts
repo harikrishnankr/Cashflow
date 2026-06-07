@@ -9,6 +9,10 @@ export const transactionStatsSchema = z.object({
   source: z.enum(INCOME_SOURCES).optional(),
   category: z.enum(EXPENSE_CATEGORIES).optional(),
   search: z.string().max(100).optional(),
+  expenseByCategories: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
 });
 
 export type TransactionStatsQuery = z.infer<typeof transactionStatsSchema>;

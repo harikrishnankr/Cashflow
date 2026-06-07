@@ -1,7 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import type { CreateIncomeInput, UpdateIncomeInput } from "@/schema/transaction/income.schema";
-import type { CreateExpenseInput, UpdateExpenseInput } from "@/schema/transaction/expense.schema";
+import type {
+  CreateIncomeInput,
+  UpdateIncomeInput,
+} from "@/schema/transaction/income.schema";
+import type {
+  CreateExpenseInput,
+  UpdateExpenseInput,
+} from "@/schema/transaction/expense.schema";
 import type {
   CreateRecurringIncomeInput,
   UpdateRecurringIncomeInput,
@@ -13,6 +19,7 @@ import type {
   ListRecurringQuery,
   TransactionStatsQuery,
   TransactionStats,
+  ExpenseByCategoryItem,
   TransactionListItem,
   IncomeListItem,
   ExpenseListItem,
@@ -39,7 +46,9 @@ type RawRow = {
 };
 
 function toDateString(v: Date | string): string {
-  return v instanceof Date ? v.toISOString().slice(0, 10) : String(v).slice(0, 10);
+  return v instanceof Date
+    ? v.toISOString().slice(0, 10)
+    : String(v).slice(0, 10);
 }
 
 function toISOString(v: Date | string): string {
@@ -167,7 +176,10 @@ export const transactionRepository = {
 
   // ── Stats (filter-aware totals, no pagination) ─────────────────────────
 
-  async getTransactionStats(userId: string, q: TransactionStatsQuery): Promise<TransactionStats> {
+  async getTransactionStats(
+    userId: string,
+    q: TransactionStatsQuery,
+  ): Promise<TransactionStats> {
     const dateFrom = q.dateFrom ? new Date(q.dateFrom) : null;
     const dateTo = q.dateTo ? new Date(q.dateTo) : null;
     const searchPattern = q.search ? `%${q.search}%` : null;
@@ -210,8 +222,9 @@ export const transactionRepository = {
           : Prisma.sql`${incomeArm} UNION ALL ${expenseArm}`;
 
     type StatsRow = { income: string; spending: string; count: number };
+    type CategoryRow = { category: string; amount: string };
 
-    const [row] = await prisma.$queryRaw<StatsRow[]>(Prisma.sql`
+    const statsQuery = prisma.$queryRaw<StatsRow[]>(Prisma.sql`
       SELECT
         COALESCE(SUM(CASE WHEN type = 'income'  THEN amount ELSE 0 END), 0)::numeric AS income,
         COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0)::numeric AS spending,
@@ -219,9 +232,48 @@ export const transactionRepository = {
       FROM (${dataArm}) AS combined
     `);
 
+    const categoryQuery = q.expenseByCategories
+      ? prisma.$queryRaw<CategoryRow[]>(Prisma.sql`
+          SELECT category::text AS category, SUM(amount)::numeric AS amount
+          FROM expenses
+          WHERE "userId"    = ${userId}::uuid
+            AND "deletedAt" IS NULL
+            AND (${dateFrom}::date    IS NULL OR date          >= ${dateFrom}::date)
+            AND (${dateTo}::date      IS NULL OR date          <= ${dateTo}::date)
+            AND (${categoryVal}::text IS NULL OR category::text = ${categoryVal}::text)
+            AND (
+              ${searchPattern}::text IS NULL
+              OR notes        ILIKE ${searchPattern}
+              OR amount::text ILIKE ${searchPattern}
+            )
+          GROUP BY category
+          ORDER BY amount DESC
+        `)
+      : Promise.resolve(null);
+
+    const [[row], categoryRows] = await Promise.all([
+      statsQuery,
+      categoryQuery,
+    ]);
+
     const income = parseFloat(row?.income ?? "0");
     const spending = parseFloat(row?.spending ?? "0");
-    return { income, spending, net: income - spending, count: row?.count ?? 0 };
+
+    const result: TransactionStats = {
+      income,
+      spending,
+      net: income - spending,
+      count: row?.count ?? 0,
+    };
+
+    if (categoryRows) {
+      result.expenseByCategories = categoryRows.map((r) => ({
+        category: r.category as ExpenseByCategoryItem["category"],
+        amount: parseFloat(r.amount),
+      }));
+    }
+
+    return result;
   },
 
   // ── Income CRUD ────────────────────────────────────────────────────────
@@ -443,7 +495,10 @@ export const transactionRepository = {
 
   // ── Recurring Income CRUD ──────────────────────────────────────────────
 
-  async createRecurringIncome(userId: string, data: CreateRecurringIncomeInput) {
+  async createRecurringIncome(
+    userId: string,
+    data: CreateRecurringIncomeInput,
+  ) {
     const startDate = new Date(data.startDate);
     return prisma.recurringIncome.create({
       data: {
@@ -471,10 +526,14 @@ export const transactionRepository = {
       where: { id, userId },
       data: {
         ...(data.source !== undefined && { source: data.source }),
-        ...(data.description !== undefined && { description: data.description }),
+        ...(data.description !== undefined && {
+          description: data.description,
+        }),
         ...(data.amount !== undefined && { amount: data.amount }),
         ...(data.frequency !== undefined && { frequency: data.frequency }),
-        ...(data.startDate !== undefined && { startDate: new Date(data.startDate) }),
+        ...(data.startDate !== undefined && {
+          startDate: new Date(data.startDate),
+        }),
         ...(data.endDate !== undefined && { endDate: new Date(data.endDate) }),
         ...(data.notes !== undefined && { notes: data.notes }),
         ...(data.reminderDaysBefore !== undefined && {
@@ -498,7 +557,10 @@ export const transactionRepository = {
 
   // ── Recurring Expense CRUD ─────────────────────────────────────────────
 
-  async createRecurringExpense(userId: string, data: CreateRecurringExpenseInput) {
+  async createRecurringExpense(
+    userId: string,
+    data: CreateRecurringExpenseInput,
+  ) {
     const startDate = new Date(data.startDate);
     return prisma.recurringExpense.create({
       data: {
@@ -526,10 +588,14 @@ export const transactionRepository = {
       where: { id, userId },
       data: {
         ...(data.category !== undefined && { category: data.category }),
-        ...(data.description !== undefined && { description: data.description }),
+        ...(data.description !== undefined && {
+          description: data.description,
+        }),
         ...(data.amount !== undefined && { amount: data.amount }),
         ...(data.frequency !== undefined && { frequency: data.frequency }),
-        ...(data.startDate !== undefined && { startDate: new Date(data.startDate) }),
+        ...(data.startDate !== undefined && {
+          startDate: new Date(data.startDate),
+        }),
         ...(data.endDate !== undefined && { endDate: new Date(data.endDate) }),
         ...(data.notes !== undefined && { notes: data.notes }),
         ...(data.reminderDaysBefore !== undefined && {

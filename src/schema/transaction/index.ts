@@ -234,9 +234,15 @@ export type RecurringExpenseDto = {
 export type TransactionTypeFilter = "all" | "income" | "expense";
 export type SortValue = "date:desc" | "date:asc" | "createdAt:desc" | "createdAt:asc";
 
+export type ExpenseByCategoryItem = {
+  category: ExpenseCategory;
+  amount: number;
+};
+
 export type TransactionStats = {
   income: number;
   spending: number;
   net: number;
   count: number;
+  expenseByCategories?: ExpenseByCategoryItem[];
 };
