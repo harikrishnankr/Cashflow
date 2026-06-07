@@ -11,7 +11,7 @@ export type BudgetDto = {
   id: number;
   userId: string;
   name: string;
-  category: string | null;
+  category: string;
   amount: number;
   period: BudgetPeriodValue;
   periodStart: string;
@@ -25,7 +25,7 @@ export type BudgetDto = {
 export type BudgetListItem = {
   id: number;
   name: string;
-  category: string | null;
+  category: string;
   amount: number;
   period: BudgetPeriodValue;
   periodStart: string;
